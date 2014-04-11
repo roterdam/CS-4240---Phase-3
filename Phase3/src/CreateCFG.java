@@ -55,10 +55,6 @@ public class CreateCFG {
 				// let it go
 
 			}
-
-			System.out.println(blockCode);
-			System.out.println("**********");
-
 			blocks.add(new CFGNode(blockCode));
 		}
 
@@ -84,17 +80,13 @@ public class CreateCFG {
 			if (lines[i].contains("goto")) {
 				// OBEY rule 3
 				if ((i + 1) >= lines.length) {
-					// theLeaders.add("("+(lines.length+1)+")");
 					theLeaders.add("End of Code");
 				} else {
 					theLeaders.add(lines[i + 1]);
 				}
 
 				// Figure out where the goto is going to...
-				String[] goingTo = lines[i].split(","); // originally was
-														// split at goto
-				// char whatNumber = goingTo[1].charAt(1);
-				// theLeaders.add(lines[(Integer.parseInt(""+whatNumber))-1]);
+				String[] goingTo = lines[i].split(","); 
 				// //OBEY rule 2
 				String where = goingTo[1].trim();
 				// find that spot
@@ -107,7 +99,6 @@ public class CreateCFG {
 			if (lines[i].contains("breq")||lines[i].contains("brneq")||lines[i].contains("brlt")||lines[i].contains("brgt")||lines[i].contains("brgeq")||lines[i].contains("brleq")) {
 				// OBEY rule 3
 				if ((i + 1) >= lines.length) {
-					// theLeaders.add("("+(lines.length+1)+")");
 					theLeaders.add("End of Code");
 				} else {
 					theLeaders.add(lines[i + 1]);
@@ -121,9 +112,39 @@ public class CreateCFG {
 					if (lines[j].contains(where + ":")) {
 						theLeaders.add(lines[j]); // OBEY rule2
 					}
-				}
+				}                               
 			}
+//			//This is "Return"
+//			if (lines[i].contains("call")) {
+//				// OBEY rule 3
+//				if ((i + 1) >= lines.length) {
+//					theLeaders.add("End of Code");
+//				} else {
+//					theLeaders.add(lines[i + 1]);
+//				}
+//			}
 		}
 		return theLeaders;
+	}
+	
+	/**
+	 * There is a directed edge from basic block B1 to basic block B2 in the CFG  if:
+	(1) There is a branch from the last statement of B1 to the first
+         statement of B2, or
+	(2) Control flow can fall through from B1 to B2 because:
+           (i) B2 immediately follows B1, and 
+           (ii) B1 does not end with an unconditional branch
+	 * @param blocks
+	 * @return
+	 */
+	public CFGNode createEdges(HashSet<CFGNode> blocks){
+		ArrayList<CFGNode> blockList = new ArrayList<CFGNode>();
+		for (CFGNode each : blocks) {
+			blockList.add(each);
+		}
+		
+		CFGNode startNode=blockList.get(0);
+		
+		return startNode;
 	}
 }

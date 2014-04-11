@@ -35,11 +35,16 @@ public class CFGNode {
 	}
 	/**
 	 * This change the toString so that it will show the IR Code of the basic block. It'll be in a "box" so it's easier to see.
-	 * Ex. [*** prod := 0
-	 * 		    i := 1 ***][*** t1 := 4*i ***]
+	 * Ex. [***
+	 * 			 prod := 0
+	 * 		    i := 1 
+	 * 		***]
+	 * 		[***
+	 * 		 t1 := 4*i 
+	 * 		***]
 	 */
 	 @Override public String toString() {
-		return "[*** "+ IRcode +" ***]";
+		return "[**********\n"+ IRcode +"\n**********]";
 		 
 	 }
 
