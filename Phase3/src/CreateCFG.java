@@ -10,33 +10,6 @@ import java.util.HashSet;
 public class CreateCFG {
 
 	/**
-	 * testing
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		/*
-		 * String lowLevelIRCode =
-		 * "(1)   prod := 0\n(2)   i := 1\n(3)   t1 := 4 * i\n(4)   t2 := a[t1]\n"
-		 * + "(5)   t3 := 4 * i\n(6)   t4 := b[t3]\n(7)   t5 := t2 * t4\n" +
-		 * "(8)   t6 := prod + t5\n(9)   prod := t6\n(10)   t7 := i + 1\n" +
-		 * "(11)   i := t7\n(12)   if i <= 20 goto (3)";
-		 */
-
-		// this is assuming we take out any blank lines and leading/trailing
-		// white space
-		String highLevelIRCode = "assign, X, 100, 10\nassign, Y, 100, 10\nassign, i, 0,\nassign sum, 0,"
-				+ "\nmain:\nbrgeq, i, 100, end_loop\narray_load, t1, X, i\narray_load, t2, Y, i\nmult, t3, t1, t2\n"
-				+ "add, sum, sum, t3\nadd, i, i, 1\ngoto, main, ,\nend_loop:\ncall, printi, sum";
-
-		// So first things first, I have to identify the Leaders of the basic
-		// block
-		HashSet<String> leaders = findLeaders(highLevelIRCode);
-		// now we need to make the blocks
-		HashSet<CFGNode> blocks = buildBlocks(leaders, highLevelIRCode);
-	}
-
-	/**
 	 * This will build the basic blocks. The basic block corresponding to a
 	 * leader consists of the leader, plus all statements up to but not
 	 * including the next leader or up to the end of the program
@@ -44,7 +17,7 @@ public class CreateCFG {
 	 * @param leaders
 	 * @return
 	 */
-	private static HashSet<CFGNode> buildBlocks(HashSet<String> leaders,
+	public HashSet<CFGNode> buildBlocks(HashSet<String> leaders,
 			String irCode) {
 		ArrayList<String> leaderList = new ArrayList<String>();
 		for (String each : leaders) {
@@ -99,7 +72,7 @@ public class CreateCFG {
 	 * 
 	 * @return
 	 */
-	private static HashSet<String> findLeaders(String irCode) {
+	public HashSet<String> findLeaders(String irCode) {
 		HashSet<String> theLeaders = new HashSet<String>();
 
 		// Split up each line of the IR code
@@ -131,7 +104,7 @@ public class CreateCFG {
 					}
 				}
 			}
-			if (lines[i].contains("br")) {
+			if (lines[i].contains("breq")||lines[i].contains("brneq")||lines[i].contains("brlt")||lines[i].contains("brgt")||lines[i].contains("brgeq")||lines[i].contains("brleq")) {
 				// OBEY rule 3
 				if ((i + 1) >= lines.length) {
 					// theLeaders.add("("+(lines.length+1)+")");
