@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * This is the main class that will be used to create a Control Flow Graph
@@ -30,7 +31,7 @@ public class CreateCFG {
 
 		// So first things first, I have to identify the Leaders of the basic
 		// block
-		ArrayList<String> leaders = findLeaders(highLevelIRCode);
+		HashSet<String> leaders = findLeaders(highLevelIRCode);
 
 		for (String each : leaders) {
 			System.out.println(each);
@@ -44,8 +45,8 @@ public class CreateCFG {
 	 * 
 	 * @return
 	 */
-	private static ArrayList<String> findLeaders(String irCode) {
-		ArrayList<String> theLeaders = new ArrayList<String>();
+	private static HashSet<String> findLeaders(String irCode) {
+		HashSet<String> theLeaders = new HashSet<String>();
 
 		// Split up each line of the IR code
 		String[] lines = irCode.split("\n");
