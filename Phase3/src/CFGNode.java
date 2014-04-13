@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 /**
  * This class is the node that will be used in the Control Flow Graph
  * @author Crystal
@@ -11,19 +13,20 @@ public class CFGNode {
 	/**
 	 * The next basic block
 	 */
-	private CFGNode nextBlock;
+	private LinkedList<CFGNode> nextBlock;
 	/**
 	 * Cnstructor
 	 * @param code
 	 */
 	public CFGNode(String code){
 		IRcode=code;
+		nextBlock=new LinkedList<CFGNode>();
 	}
 	/**
 	 *
 	 * @return the next basic block
 	 */
-	public CFGNode getNextBlock() {
+	public LinkedList<CFGNode> getNextBlock() {
 		return nextBlock;
 	}
 	/**
@@ -31,7 +34,7 @@ public class CFGNode {
 	 * @param nextBlock
 	 */
 	public void setNextBlock(CFGNode nextBlock) {
-		this.nextBlock = nextBlock;
+		this.nextBlock.add(nextBlock);
 	}
 	/**
 	 * This change the toString so that it will show the IR Code of the basic block. It'll be in a "box" so it's easier to see.
