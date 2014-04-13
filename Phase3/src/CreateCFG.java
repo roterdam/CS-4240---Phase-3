@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Stack;
 
 /**
  * This is the main class that will be used to create a Control Flow Graph
@@ -17,8 +19,7 @@ public class CreateCFG {
 	 * @param leaders
 	 * @return
 	 */
-	public HashSet<CFGNode> buildBlocks(HashSet<String> leaders,
-			String irCode) {
+	public HashSet<CFGNode> buildBlocks(HashSet<String> leaders, String irCode) {
 		ArrayList<String> leaderList = new ArrayList<String>();
 		for (String each : leaders) {
 			leaderList.add(each);
@@ -40,11 +41,11 @@ public class CreateCFG {
 					}
 				}
 				// everyone else
-				if (found == 1) {	//if we are at the line after the leader
-					if(!leaders.contains(lines[i])){
+				if (found == 1) { // if we are at the line after the leader
+					if (!leaders.contains(lines[i])) {
 						blockCode = blockCode + "\n" + lines[i];
 					} else {
-						found=0;
+						found = 0;
 						break;
 					}
 				}
@@ -86,7 +87,7 @@ public class CreateCFG {
 				}
 
 				// Figure out where the goto is going to...
-				String[] goingTo = lines[i].split(","); 
+				String[] goingTo = lines[i].split(",");
 				// //OBEY rule 2
 				String where = goingTo[1].trim();
 				// find that spot
@@ -96,7 +97,9 @@ public class CreateCFG {
 					}
 				}
 			}
-			if (lines[i].contains("breq")||lines[i].contains("brneq")||lines[i].contains("brlt")||lines[i].contains("brgt")||lines[i].contains("brgeq")||lines[i].contains("brleq")) {
+			if (lines[i].contains("breq") || lines[i].contains("brneq")
+					|| lines[i].contains("brlt") || lines[i].contains("brgt")
+					|| lines[i].contains("brgeq") || lines[i].contains("brleq")) {
 				// OBEY rule 3
 				if ((i + 1) >= lines.length) {
 					theLeaders.add("End of Code");
@@ -112,39 +115,143 @@ public class CreateCFG {
 					if (lines[j].contains(where + ":")) {
 						theLeaders.add(lines[j]); // OBEY rule2
 					}
-				}                               
+				}
 			}
-//			//This is "Return"
-//			if (lines[i].contains("call")) {
-//				// OBEY rule 3
-//				if ((i + 1) >= lines.length) {
-//					theLeaders.add("End of Code");
-//				} else {
-//					theLeaders.add(lines[i + 1]);
-//				}
-//			}
+			// //This is "Return"
+			// if (lines[i].contains("call")) {
+			// // OBEY rule 3
+			// if ((i + 1) >= lines.length) {
+			// theLeaders.add("End of Code");
+			// } else {
+			// theLeaders.add(lines[i + 1]);
+			// }
+			// }
 		}
 		return theLeaders;
 	}
-	
+
 	/**
-	 * There is a directed edge from basic block B1 to basic block B2 in the CFG  if:
-	(1) There is a branch from the last statement of B1 to the first
-         statement of B2, or
-	(2) Control flow can fall through from B1 to B2 because:
-           (i) B2 immediately follows B1, and 
-           (ii) B1 does not end with an unconditional branch
+	 * There is a directed edge from basic block B1 to basic block B2 in the CFG
+	 * if: (1) There is a branch from the last statement of B1 to the first
+	 * statement of B2, or (2) Control flow can fall through from B1 to B2
+	 * because: (i) B2 immediately follows B1, and (ii) B1 does not end with an
+	 * unconditional branch
+	 * 
 	 * @param blocks
 	 * @return
 	 */
-	public CFGNode createEdges(HashSet<CFGNode> blocks){
+	public CFGNode createEdges(HashSet<CFGNode> blocks, String irCode) {
+		// Split up each line of the IR code
+		String[] lines = irCode.split("\n");
+
+		// Get the blocks in a list
 		ArrayList<CFGNode> blockList = new ArrayList<CFGNode>();
 		for (CFGNode each : blocks) {
 			blockList.add(each);
 		}
-		
-		CFGNode startNode=blockList.get(0);
-		
+
+		CFGNode startNode = null;
+		// find the start node
+		for (CFGNode each : blocks) {
+			if (each.toString().contains(lines[0])) {
+				startNode = each;
+			}
+		}
+
+		// *************** deal with rule 2 for directed edges
+		// *******************
+		Stack<CFGNode> nodeStack = new Stack<CFGNode>();
+		for (CFGNode each : blocks) {
+			nodeStack.add(each);
+		}
+
+		CFGNode current = startNode; // so first start with the current node
+		while (!nodeStack.isEmpty()) {
+			String[] elements = current.toString().split("\n");
+			// look at it's last element-1 for the last line of code in it
+			String element = elements[elements.length - 2];
+			if (!element.contains("goto")) { // if the line isn't goto,
+				// then navigate to that line in the ircode
+				String nextElement = "";
+				for (int i = 0; i < lines.length; i++) {
+					if (lines[i].compareTo(element) == 0) {
+						if (i + 1 < lines.length) {
+							// look at the next line in ircode
+							nextElement = lines[i + 1];
+						}
+					}
+				}
+				if (nextElement.compareTo("") != 0) {
+					CFGNode nextNode = null;
+					// find that line in another node
+					for (CFGNode each : blocks) {
+						if (each.toString().contains(nextElement)) {
+							nextNode = each;
+						}
+					}
+					// set the next of current node to the node
+					current.setNextBlock(nextNode);
+					nodeStack.remove(current);
+					current = nextNode;
+				}
+			}
+			// if goto
+			else {
+				nodeStack.remove(current);
+				if (!nodeStack.isEmpty()) {
+					current = nodeStack.pop();
+				} else {
+					// you can't go any farther because the blocks don't connect
+					return startNode;
+				}
+			}
+		}
+		// ****************done with rule 2
+		// ********** work on rule 1
+		for (String line : lines) {
+			if (line.contains("breq") || line.contains("brneq")
+					|| line.contains("brlt") || line.contains("brgt")
+					|| line.contains("brgeq") || line.contains("brleq")) {
+				//find the block with that line
+				CFGNode block =null;
+				for(CFGNode eachBlock:blocks){
+					if(eachBlock.toString().contains(line)){
+						block=eachBlock;
+						break;
+					}
+				}
+				// Figure out where the br is going to...
+				String[] branch = line.split(",");
+				String where = branch[3].trim();
+				//find the node with that
+				for(CFGNode eachNode:blocks){
+					if(eachNode.toString().contains(where+":")){
+						block.setNextBlock(eachNode);
+						break;
+					}
+				}
+			}
+			if(line.contains("goto")){
+				//find the block with that line
+				CFGNode block =null;
+				for(CFGNode eachBlock:blocks){
+					if(eachBlock.toString().contains(line)){
+						block=eachBlock;
+						break;
+					}
+				}
+				// Figure out where the goto is going to...
+				String[] goingTo = line.split(",");
+				String where = goingTo[1].trim();
+				//find the node with that
+				for(CFGNode eachNode:blocks){
+					if(eachNode.toString().contains(where+":")){
+						block.setNextBlock(eachNode);
+						break;
+					}
+				}
+			}
+		}
 		return startNode;
 	}
 }
