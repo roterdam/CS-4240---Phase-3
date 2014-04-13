@@ -1,21 +1,27 @@
 package CodeGeneration;
 
 public class Instructions {
-	private IROPCODE irOp;
+	//private IROPCODE irOp;
 	private MIPSOPCODE mipsOp;
 	private REGISTERS regX, regY, regZ;
 	private String immediateL, immediateR, label;
 	
-	public Instructions(String str) {
-		//mips(str);
+	public Instructions(IROPCODE op, REGISTERS regX, REGISTERS regY, REGISTERS regZ, String immediateL, String immediateR, String label) {
+		//this.mipsOp = mips(op);
+		this.regX = regX;
+		this.regY = regY;
+		this.regZ = regZ;
+		this.immediateL = immediateL;
+		this.immediateR = immediateR;
+		this.label = label;
 	}
 	
-	public IROPCODE getIROp() {
+	/*public IROPCODE getIROp() {
 		return irOp;
 	}
 	public void setIROp(IROPCODE irOp) {
 		this.irOp = irOp;
-	}
+	}*/
 	
 	public MIPSOPCODE getMipsOp() {
 		return mipsOp;
@@ -68,29 +74,29 @@ public class Instructions {
 		if ((regX == null) && (regY == null) && (regZ == null) && (immediateR == null) && (label == null)) {
 			return ("\t" + mipsOp);
 		} else if ((regY == null) && (regZ == null) && (immediateR == null) && (label == null)) {
-			return ("\t" + mipsOp + " $" + regX);
+			return ("\t" + mipsOp + " " + regX);
 		} else if ((regX == null) && (regY == null) && (regZ == null) && (immediateR == null)) {
 				return ("\t" + mipsOp + " " + label);
 		} else if ((regY == null) && (regZ == null) && (immediateR == null)) {
-			return ("\t" + mipsOp + " $" + regX + " " + label);
+			return ("\t" + mipsOp + " " + regX + " " + label);
 		} else if ((regY == null) && (regZ == null)) {
-				return ("\t" + mipsOp + " $" + regX + " " + immediateR + " " + label);
+				return ("\t" + mipsOp + " " + regX + " " + immediateR + " " + label);
 		} else if ((regY == null) && (regZ == null) && (label == null)) {
-				return ("\t" + mipsOp + " $" + regX + " " + immediateR);
+				return ("\t" + mipsOp + " " + regX + " " + immediateR);
 		} else if ((regZ == null) && (immediateR == null) && (label == null)) {
-			return ("\t" + mipsOp + " $" + regX + " $" + regY);
+			return ("\t" + mipsOp + " " + regX + " " + regY);
 		} else if ((regZ == null) && (immediateL != null) && (immediateR == null) && (label == null)) {
-			return ("\t" + mipsOp + " $" + regX + immediateL + "("+ " $" + regY + ")");
+			return ("\t" + mipsOp + " " + regX + immediateL + "(" + regY + ")");
 		} else if ((immediateR == null) && (label == null)) {
-			return ("\t" + mipsOp + " $" + regX + " $" + regY + " " + regZ);
+			return ("\t" + mipsOp + " " + regX + " " + regY + " " + regZ);
 		} else if ((regZ == null) && (label == null)){
-			return ("\t" + mipsOp + " $" + regX + " $" + regY + " " + immediateR);
+			return ("\t" + mipsOp + " " + regX + " " + regY + " " + immediateR);
 		} else {
 			return null;
 		}
 	}
 	
-	/*private static final MIPSOPCODE mips(String opText) {
+	/*private static final MIPSOPCODE mips(IROPCODE op) {
 		switch (opText) {
 			case "":
 				return ;

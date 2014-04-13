@@ -1,5 +1,5 @@
 package CodeGeneration;
 
-public class REGISTERS {
+public enum REGISTERS {
 
 }

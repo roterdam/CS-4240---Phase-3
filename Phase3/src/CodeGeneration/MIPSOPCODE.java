@@ -1,5 +1,5 @@
 package CodeGeneration;
 
-public class MIPSOPCODE {
+public enum MIPSOPCODE {
 
 }
