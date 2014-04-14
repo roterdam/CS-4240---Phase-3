@@ -7,12 +7,10 @@ public class CodeGeneration {
 	private LinkedList<IR> ir;
 	private IRList l;
 	private Instructions instr;
-	private int i;
 	
 	public CodeGeneration() {
 		list = new LinkedList<Instructions>();
-		ir = l.list();
-		i = 0;
+		//ir = l.list();
 	}
 	
 	public void instructList(IR irInstr) {
@@ -35,5 +33,4 @@ public class CodeGeneration {
 	public LinkedList<Instructions> instList() {
 		return list;
 	}
-	
 }

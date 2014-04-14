@@ -1,6 +1,7 @@
 package CodeGeneration;
 
 import static CodeGeneration.MIPSOPCODE.*;
+import static CodeGeneration.REGISTERS.*;
 
 public class Instructions {
 	//private IROPCODE irOp;

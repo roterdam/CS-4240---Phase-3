@@ -1,5 +1,8 @@
 package CodeGeneration;
 
+import static CodeGeneration.IROPCODE.*;
+import static CodeGeneration.REGISTERS.*;
+
 public class IR {
 	private IROPCODE irOp;
 	private REGISTERS regX, regY, regZ;
