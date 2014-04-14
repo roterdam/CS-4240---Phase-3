@@ -50,5 +50,13 @@ public class CFGNode {
 		return "[**********\n"+ IRcode +"\n**********]";
 		 
 	 }
+	 
+	 /**
+	  * This will return the IRCode in the block, separated by \n for each line
+	  * @return
+	  */
+	 public String getIrCode(){
+		 return IRcode;
+	 }
 
 }
