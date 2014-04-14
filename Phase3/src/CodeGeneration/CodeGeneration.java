@@ -13,14 +13,14 @@ public class CodeGeneration {
 		//ir = l.list();
 	}
 	
-	public void addInstructions(IR irInstr) {
+	public void addInstructions() {
 		for (IR r: ir) {
 			if (r.getIrOp().equals(IROPCODE.ASSIGN)) {
 				/*instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
 				instr.setMipsOp(MIPSOPCODE.la);
 				list.add(instr);
+				instr = new Instructions(null, r.getRegX(), r.getRegY(), null, null, null, null);
 				instr.setMipsOp(MIPSOPCODE.lw);
-				//instr = new Instructions(null, r.getRegX(), r.getRegY(), null, null, null, null);
 				list.add(instr);*/
 			} else if (r.getIrOp().equals(IROPCODE.CALL)) {
 				

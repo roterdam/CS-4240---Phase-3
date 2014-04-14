@@ -8,6 +8,15 @@ public class IR {
 	private REGISTERS regX, regY, regZ;
 	private String immediate, label;
 	
+	public IR (IROPCODE op, REGISTERS regX, REGISTERS regY, REGISTERS regZ, String immediate, String label) {
+		this.irOp = op;
+		this.regX = regX;
+		this.regY = regY;
+		this.regZ = regZ;
+		this.immediate = immediate;
+		this.label = label;
+	}
+	
 	public IROPCODE getIrOp() {
 		return irOp;
 	}
