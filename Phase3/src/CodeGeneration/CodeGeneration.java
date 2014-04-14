@@ -17,18 +17,23 @@ public class CodeGeneration {
 	
 	public void instructList(IR irInstr) {
 		for (IR r: ir) {
-			/*if (r.getIrOp().equals(MIPSOPCODE.MULT)) {
-				instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), null, null, null);
+			if (r.getIrOp().equals(IROPCODE.ASSIGN)) {
+				instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
+				instr.setMipsOp(MIPSOPCODE.la);
 				list.add(instr);
-				instr = new Instructions(, r.getRegX(), r.getRegY(), null, null, null);
-				list.add(instr);
-				instr = new Instructions(, r.getRegX(), r.getRegY(), null, null, null);
+				instr.setMipsOp(MIPSOPCODE.lw);
+				//instr = new Instructions(null, r.getRegX(), r.getRegY(), null, null, null, null);
 				list.add(instr);
 			} else {
-				instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), r.getLabel(), r.getImmediate());
+				instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
+						null, r.getImmediate(), r.getLabel());
+				list.add(instr);
 			}
-			list.add(instr);*/
 		}
+	}
+	
+	public LinkedList<Instructions> instList() {
+		return list;
 	}
 	
 }

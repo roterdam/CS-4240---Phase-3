@@ -1,13 +1,16 @@
 package CodeGeneration;
 
+import static CodeGeneration.MIPSOPCODE.*;
+
 public class Instructions {
 	//private IROPCODE irOp;
 	private MIPSOPCODE mipsOp;
 	private REGISTERS regX, regY, regZ;
 	private String immediateL, immediateR, label;
 	
-	public Instructions(IROPCODE op, REGISTERS regX, REGISTERS regY, REGISTERS regZ, String immediateL, String immediateR, String label) {
-		//this.mipsOp = mips(op);
+	public Instructions(IROPCODE op, REGISTERS regX, REGISTERS regY, REGISTERS regZ, 
+			String immediateL, String immediateR, String label) {
+		this.mipsOp = mips(op);
 		this.regX = regX;
 		this.regY = regY;
 		this.regZ = regZ;
@@ -96,52 +99,48 @@ public class Instructions {
 		}
 	}
 	
-	/*private static final MIPSOPCODE mips(IROPCODE op) {
-		switch (opText) {
-			case "":
+	private static final MIPSOPCODE mips(IROPCODE op) {
+		switch (op) {
+			case ASSIGN:
+				return null;
+			case ADD:
+				return add;
+			case SUB:
+				return sub;
+			case MULT:
+				return mul;
+			case DIV:
+				return div;
+			case AND:
+				return and;
+			case OR:
+				return or;
+			case GOTO:
+				return b;
+			case BREQ:
+				return beq;
+			case BRNEQ:
+				return bne;
+			case BRGT:
+				return bgt;
+			case BRLT:
+				return blt;
+			case BRGEQ:
+				return bge;
+			case BRLEQ:
+				return ble;
+			case RETURN:
+				return jr;
+			/*case CALL:
 				return ;
-			case "":
+			case CALLR:
 				return ;
-			case "":
+			case ARRAY_STORE:
 				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
-			case "":
-				return ;
+			case "ARRAY_LOAD":
+				return ;*/
 			default:
-				return ;
+				return null;
 		}
-	}*/
+	}
 }
