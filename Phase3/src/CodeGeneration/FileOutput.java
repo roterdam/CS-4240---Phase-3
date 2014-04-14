@@ -8,7 +8,9 @@ public class FileOutput {
 			CodeGeneration cg = new CodeGeneration();
 			fh.redirectConsole();
 			
-			for(Instructions i : cg.instList()){
+			System.out.println("\t.text");
+			System.out.println("\t.glbl main");
+			for(Instructions i : cg.instructionList()){
 				System.out.println(i.toString());	
 			}
 

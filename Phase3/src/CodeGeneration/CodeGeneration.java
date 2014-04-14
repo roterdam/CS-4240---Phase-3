@@ -13,15 +13,23 @@ public class CodeGeneration {
 		//ir = l.list();
 	}
 	
-	public void instructList(IR irInstr) {
+	public void addInstructions(IR irInstr) {
 		for (IR r: ir) {
 			if (r.getIrOp().equals(IROPCODE.ASSIGN)) {
-				instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
+				/*instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
 				instr.setMipsOp(MIPSOPCODE.la);
 				list.add(instr);
 				instr.setMipsOp(MIPSOPCODE.lw);
 				//instr = new Instructions(null, r.getRegX(), r.getRegY(), null, null, null, null);
-				list.add(instr);
+				list.add(instr);*/
+			} else if (r.getIrOp().equals(IROPCODE.CALL)) {
+				
+			} else if (r.getIrOp().equals(IROPCODE.CALLR)) {
+				
+			} else if (r.getIrOp().equals(IROPCODE.ARRAY_STORE)) {
+				
+			} else if (r.getIrOp().equals(IROPCODE.ARRAY_LOAD)) {
+				
 			} else {
 				instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
 						null, r.getImmediate(), r.getLabel());
@@ -30,7 +38,7 @@ public class CodeGeneration {
 		}
 	}
 	
-	public LinkedList<Instructions> instList() {
+	public LinkedList<Instructions> instructionList() {
 		return list;
 	}
 }
