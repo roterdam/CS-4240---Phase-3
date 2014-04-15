@@ -32,5 +32,11 @@ public class RegisterAllocation {
 				System.out.println(eachNext);
 			}
 		}
+		
+		//let's start playing with registers now
+		for(CFGNode each:blocks){
+			RegisterColoring colorMe = new RegisterColoring(each);
+			colorMe.makeIRCode();
+		}
 	}
 }
