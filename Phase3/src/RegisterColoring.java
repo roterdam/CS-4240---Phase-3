@@ -25,7 +25,12 @@ public class RegisterColoring {
 	 * regiters back inthe IR code and return it.
 	 */
 	public String makeIRCode() {
-
+		Backend backend = new Backend();
+		String[] lines = theBlock.getIrCode().split("\n");
+		for(String each:lines){
+			backend.parseLine(each, theBlock);
+		}
+		//get the irNodes
 		return "";
 	}
 }
