@@ -28,7 +28,12 @@ public class RegisterColoring {
 		Backend backend = new Backend();
 		String[] lines = theBlock.getIrCode().split("\n");
 		for(String each:lines){
+			System.out.println("Line is: "+each);
 			backend.parseLine(each, theBlock);
+			System.out.println("IR Nodes are: ");
+			for(Backend.IRnode eachNode: (backend.irNodes)){
+				System.out.println(eachNode.toString());
+			}
 		}
 		//get the irNodes
 		return "";

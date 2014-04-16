@@ -113,32 +113,34 @@ public class Backend {
 			irNodes.add(new IRnode("label", OP));
 
 	}
-	
+
 	/**
-	 * Don't actually need the block param, but it's just there so we can use this in CFG too
+	 * Don't actually need the block param, but it's just there so we can use
+	 * this in CFG too
+	 * 
 	 * @param irLine
 	 * @param block
 	 */
-	public void parseLine(String irLine,CFGNode block) {
-
-		Scanner scanner = new Scanner(irLine);
-
-		String OP = scanner.next();
-		if (OP.equals("assign,"))
-			addAssign(scanner);
-		else if (OP.equals("add,") || OP.equals("sub,") || OP.equals("mult,")
-				|| OP.equals("div,") || OP.equals("and,") || OP.equals("or,"))
-			addBinaryOp(scanner, OP);
-		else if (OP.equals("goto,")) {
-			String label = scanner.next();
+	public void parseLine(String irLine, CFGNode block) {
+		String OP = irLine;
+		if (OP.contains("assign,")){
+			addAssign2(irLine);
+		}
+		else if (OP.contains("add,") || OP.equals("sub,")
+				|| OP.contains("mult,") || OP.contains("div,")
+				|| OP.contains("and,") || OP.contains("or,")){
+			addBinaryOp2(irLine);
+		}
+		else if (OP.contains("goto,")) {
+			String label = irLine;
 			label = label.substring(0, label.indexOf(","));
 			irNodes.add(new IRnode("goto", label));
-		} else if (OP.equals("breq,") || OP.equals("brneq,")
-				|| OP.equals("brlt,") || OP.equals("brgt,")
-				|| OP.equals("brgeq,") || OP.equals("brleq,"))
-			addBranch(scanner, OP);
-		else if (OP.equals("return,")) {
-			String returnVar = scanner.next();
+		} else if (OP.contains("breq,") || OP.contains("brneq,")
+				|| OP.contains("brlt,") || OP.contains("brgt,")
+				|| OP.contains("brgeq,") || OP.contains("brleq,"))
+			addBranch2(irLine);
+		else if (OP.contains("return,")) {
+			String returnVar = irLine;
 			returnVar = returnVar.substring(0, returnVar.indexOf(","));
 
 			addVarToList(returnVar);
@@ -146,20 +148,172 @@ public class Backend {
 
 			if (returnVarReg == null)
 				returnVarReg = returnVar;
-
 			irNodes.add(new IRnode("return", returnVarReg));
-
-			nextTempRegister = 0;
-			loadStoreVar("store", returnVar);
-			nextTempRegister = 0;
-		} else if (OP.equals("array_store,"))
-			addArrayStore(scanner);
-		else if (OP.equals("array_load,"))
-			addArrayLoad(scanner);
+		} else if (OP.contains("array_store,"))
+			addArrayStore2(irLine);
+		else if (OP.contains("array_load,"))
+			addArrayLoad2(irLine);
 		else if (OP.contains(":"))
 			irNodes.add(new IRnode("label", OP));
-
 	}
+
+	/**
+	 * addAssign for the CFG part
+	 * 
+	 * @param line
+	 */
+	private void addAssign2(String line) {
+		String[] instruction = line.split(",");
+		for(String each:instruction){
+			each=each.trim();
+		}
+		
+		String assignedVar="";
+		String value="";
+		
+		if(instruction.length==3){
+			assignedVar=instruction[1];
+			value = instruction[2];
+		}
+		else{
+			assignedVar=instruction[1];
+			value=instruction[3];
+		}
+
+		addVarToList(assignedVar);
+		addVarToList(value);
+
+		String assignedVarRegister = loadStoreVar("load", assignedVar);
+		String valueRegister = loadStoreVar("load", value);
+
+		if (valueRegister == null)
+			valueRegister = value;
+
+		irNodes.add(new IRnode("assign", assignedVarRegister, valueRegister));
+	}
+	/**
+	 * Binary Op For CFG
+	 */
+	private void addBinaryOp2(String line) {
+		String operand1 = "", operand2 = "", assignedVar = "";
+		
+		String[] instruction = line.split(",");
+		for(String each:instruction){
+			each=each.trim();
+		}
+		// Get the variable names
+		operand1 = instruction[1];
+		operand2 = instruction[2];
+		assignedVar = instruction[3];
+
+		addVarToList(operand1);
+		addVarToList(operand2);
+		addVarToList(assignedVar);
+
+		String operand1Reg = loadStoreVar("load", operand1);
+		String operand2Reg = loadStoreVar("load", operand2);
+		String assignedVarReg = loadStoreVar("load", assignedVar);
+		
+		String op=instruction[0];
+
+		//I instructions?
+		if (operand2Reg == null) {
+			operand2Reg = operand2;
+			op += "i";
+		}
+
+		// Create and add the node to the list of nodes
+		irNodes.add(new IRnode(op, operand1Reg, operand2Reg, assignedVarReg));
+	}
+	/**
+	 * Branching for CFG
+	 * @param line
+	 */
+	private void addBranch2(String line) {
+		String[] instruction = line.split(",");
+		for(String each:instruction){
+			each=each.trim();
+		}
+		
+		String operand1 = "", operand2 = "", afterBranchLabel = "";
+
+		// Get the operands
+		operand1 = instruction[1];
+		operand2 = instruction[2];
+		afterBranchLabel = instruction[3];
+
+		addVarToList(operand1);
+		addVarToList(operand2);
+
+		String operand1Reg = loadStoreVar("load", operand1);
+		String operand2Reg = loadStoreVar("load", operand2);
+
+		if (operand1Reg == null)
+			operand1Reg = operand1;
+		if (operand2Reg == null)
+			operand2Reg = operand2;
+
+		// Create and add the node to the list
+		irNodes.add(new IRnode(instruction[0], operand1Reg, operand2Reg, afterBranchLabel));
+	}
+	/**
+	 * ArrayStore for CFG
+	 * @param line
+	 */
+	private void addArrayStore2(String line) {
+		String[] instruction = line.split(",");
+		for(String each:instruction){
+			each=each.trim();
+		}
+		
+		String arrName = "", offset = "", storeFrom = "";
+
+		// Get operands
+		arrName = instruction[1];
+		offset = instruction[2];
+		storeFrom = instruction[3];
+
+		addVarToList(arrName);
+		addVarToList(storeFrom);
+
+		String arrNameReg = loadStoreVar("load", arrName);
+		String storeFromReg = loadStoreVar("load", storeFrom);
+
+		if (storeFromReg == null)
+			storeFromReg = storeFrom;
+
+		// Create and add new node to the list
+		irNodes.add(new IRnode("array_store", arrNameReg, offset, storeFromReg));
+	}
+	/**
+	 * ArrayLoad for CFG
+	 * @param line
+	 */
+	private void addArrayLoad2(String line) {
+		String[] instruction = line.split(",");
+		for(String each:instruction){
+			each=each.trim();
+		}
+		
+		String loadTo = "", array = "", offset = "";
+
+		// Get the operands
+		loadTo = instruction[1];
+		array = instruction[2];
+		offset = instruction[3];
+
+		addVarToList(array);
+		addVarToList(loadTo);
+
+		String arrayReg = loadStoreVar("load", array);
+		String loadToReg = loadStoreVar("load", loadTo);
+
+		// Create and add the node to the list
+		irNodes.add(new IRnode("array_load", loadToReg, arrayReg, offset));
+	}
+
+
+
 
 	private void addAssign(Scanner lineScanner) {
 
@@ -375,7 +529,7 @@ public class Backend {
 		nextTempRegister = 0;
 	}
 
-	private class IRnode {
+	public class IRnode {
 
 		String nodeType;
 		String[] operands;
