@@ -53,6 +53,8 @@ public class Backend {
 		tempRegisters.add("$t0");
 		tempRegisters.add("$t1");
 		tempRegisters.add("$t2");
+		tempRegisters.add("$t3");
+		tempRegisters.add("$t4");
 
 		nextTempRegister = 0;
 	}

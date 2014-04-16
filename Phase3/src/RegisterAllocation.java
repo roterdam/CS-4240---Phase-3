@@ -23,16 +23,16 @@ public class RegisterAllocation {
 		HashSet<CFGNode> blocks = cfg.buildBlocks(leaders, ex1);
 		CFGNode graph = cfg.createEdges(blocks,ex1);
 		
-		//test
-		for(CFGNode each:blocks){
-			System.out.println("------This block--------");
-			System.out.println(each);
-			System.out.println("-----Can Go To ---------");
-			for(CFGNode eachNext:each.getNextBlock()){
-				System.out.println(eachNext);
-			}
-		}
-		
+		//Print out basic blocks
+//		for(CFGNode each:blocks){
+//			System.out.println("------This block--------");
+//			System.out.println(each);
+//			System.out.println("-----Can Go To ---------");
+//			for(CFGNode eachNext:each.getNextBlock()){
+//				System.out.println(eachNext);
+//			}
+//		}
+//		
 		//let's start playing with registers now
 		for(CFGNode each:blocks){
 			RegisterColoring colorMe = new RegisterColoring(each);
