@@ -36,11 +36,22 @@ public class RegisterColoring {
 		for (int i = 0; i < lines.length; i++) {
 			ArrayList<RegisterNode> currentRegisters = makeRegisters(lines[i],
 					i);
+
 			for (RegisterNode each : currentRegisters) {
-				System.out.println(each.getvariable() + " : "
-						+ each.getLineNumber());
-				// registers.add(each);
+				registers.add(each);
 			}
+		}
+		// look at the registers that have been made from that block
+		for (RegisterNode each : registers) {
+			System.out.println(each.getvariable() + " : "
+					+ each.getLineNumber());
+		}
+
+		// now use the registers to determine liveliness
+		registers= determineLiveliness(registers);
+		System.out.println("*********Liveliness********");
+		for(RegisterNode each:registers){
+			System.out.println(each.getvariable()+" : {"+each.getFirst()+" , "+each.getLast()+"}");
 		}
 		return "";
 	}
@@ -57,7 +68,7 @@ public class RegisterColoring {
 		ArrayList<RegisterNode> list = new ArrayList<RegisterNode>();
 		// split up the instruction and get rid of white space
 		String[] instruction = line.split(",");
-		for (int i=0;i<instruction.length;i++) {
+		for (int i = 0; i < instruction.length; i++) {
 			instruction[i] = instruction[i].trim();
 		}
 
@@ -67,7 +78,7 @@ public class RegisterColoring {
 		// branching
 		List<String> branchOp = Arrays.asList("breq", "brneq", "brlt", "brgt",
 				"brgeq", "brleq");
-		
+
 		// *************Make Some Registers ************************
 		if (binaryOp.contains(instruction[0])) {
 			// this is a binary operation
@@ -127,5 +138,54 @@ public class RegisterColoring {
 		}
 
 		return list;
+	}
+
+	/**
+	 * Goes through the list of registers and determines the liveliness. First
+	 * we'll make a list of just the variable names Then we'll go through the
+	 * list of registers and find the first and last occurance of each variable
+	 * 
+	 * @param registers
+	 * @return
+	 */
+	private ArrayList<RegisterNode> determineLiveliness(
+			ArrayList<RegisterNode> registers) {
+		ArrayList<RegisterNode> newRegisters = new ArrayList<RegisterNode>();
+		// get the variables
+		ArrayList<String> variables = new ArrayList<String>();
+		for (RegisterNode each : registers) {
+			if (!variables.contains(each.getvariable())) {
+				variables.add(each.getvariable());
+			}
+		}
+
+		// determine the first and last occurances of each variable
+		for (String each : variables) {
+			int first = 9999, last = 9999; // meaning not instanciated
+			for (RegisterNode eachNode : registers) {
+				if (eachNode.getvariable().equals(each)) {
+					// check if first has been assigned
+					if (first == 9999) {// not assigned yet
+						first = eachNode.getLineNumber();
+					}
+					//determine the last occurance
+					if(last==9999){
+						last = eachNode.getLineNumber();
+					}
+					else{
+						if(eachNode.getLineNumber()>last){
+							last=eachNode.getLineNumber();
+						}
+					}
+				}
+			}
+			//make a new node with that variable and it's first
+			RegisterNode node = new RegisterNode(each,first,"");
+			node.setFirst(first);
+			node.setLast(last);
+			newRegisters.add(node);
+		}
+
+		return newRegisters;
 	}
 }

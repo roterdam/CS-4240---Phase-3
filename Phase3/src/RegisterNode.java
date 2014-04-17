@@ -9,7 +9,7 @@ import java.util.ArrayList;
  */
 public class RegisterNode {
 	private String variable, type;
-	private int color, lineNumber;
+	private int color, lineNumber,first,last;
 	private ArrayList<RegisterNode> neighbors;
 	
 	/**
@@ -62,6 +62,22 @@ public class RegisterNode {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public int getFirst() {
+		return first;
+	}
+
+	public void setFirst(int first) {
+		this.first = first;
+	}
+
+	public int getLast() {
+		return last;
+	}
+
+	public void setLast(int last) {
+		this.last = last;
 	}
 	
 }
