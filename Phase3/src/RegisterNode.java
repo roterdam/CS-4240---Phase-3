@@ -23,6 +23,7 @@ public class RegisterNode {
 		setLineNumber(line);
 		this.setType(type);
 		neighbors = new ArrayList<RegisterNode>();
+		color=0;
 	}
 
 	public String getvariable() {

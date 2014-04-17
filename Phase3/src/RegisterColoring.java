@@ -45,13 +45,10 @@ public class RegisterColoring {
 
 		// now use the registers to determine liveliness
 		registers = determineLiveliness(registers);
-		System.out.println("*********Liveliness********");
-		for (RegisterNode each : registers) {
-			System.out.println(each.getvariable() + " : {" + each.getFirst()
-					+ " , " + each.getLast() + "}");
-		}
+
 		// use the registers's liveliness to determine neighbors in a graph
 		registers = determineNeighbors(registers);
+
 		System.out.println("-----Neighbors----");
 		for (RegisterNode each : registers) {
 			System.out.print(each.getvariable() + ": {");
@@ -60,6 +57,14 @@ public class RegisterColoring {
 				System.out.print(",");
 			}
 			System.out.println("}");
+		}
+
+		// next, color the graph!
+		registers = colorRegisters(registers);
+		
+		System.out.println("------Colors------");
+		for (RegisterNode each : registers) {
+			System.out.println(each.getvariable()+": "+each.getColor());
 		}
 		return "";
 	}
@@ -215,11 +220,40 @@ public class RegisterColoring {
 				if (firstNode != checkNode
 						&& checkNode.getFirst() >= firstNode.getFirst()
 						&& checkNode.getFirst() <= firstNode.getLast()
-						&& (checkNode.getLast() <= firstNode.getLast() || 
-							checkNode.getLast() > firstNode.getLast())) {
+						&& (checkNode.getLast() <= firstNode.getLast() || checkNode
+								.getLast() > firstNode.getLast())) {
 					// means they are neighbors!
 					firstNode.addNeighbor(checkNode);
 					checkNode.addNeighbor(firstNode);
+				}
+			}
+		}
+
+		return registers;
+	}
+
+	/**
+	 * Next we need to color the registers. To do this, we'll start out by
+	 * taking a node with the most neighbors and coloring it one color, then
+	 * coloring each neighbor a different color. Then look at another node, and
+	 * color it if it's not colored
+	 * 
+	 * @param registers
+	 * @return
+	 */
+	private ArrayList<RegisterNode> colorRegisters(
+			ArrayList<RegisterNode> registers) {
+		int color = 1;
+
+		for (RegisterNode each : registers) {
+			if (each.getColor() == 0) {
+				color = 1;
+				each.setColor(color);
+				for (RegisterNode neighbor : each.getNeighbors()) {
+					if (neighbor.getColor() != 0) {
+						color++;
+						neighbor.setColor(color);
+					}
 				}
 			}
 		}
