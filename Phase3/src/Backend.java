@@ -166,8 +166,8 @@ public class Backend {
 	 */
 	private void addAssign2(String line) {
 		String[] instruction = line.split(",");
-		for(String each:instruction){
-			each=each.trim();
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
 		}
 		
 		String assignedVar="";
@@ -200,8 +200,8 @@ public class Backend {
 		String operand1 = "", operand2 = "", assignedVar = "";
 		
 		String[] instruction = line.split(",");
-		for(String each:instruction){
-			each=each.trim();
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
 		}
 		// Get the variable names
 		operand1 = instruction[1];
@@ -233,8 +233,8 @@ public class Backend {
 	 */
 	private void addBranch2(String line) {
 		String[] instruction = line.split(",");
-		for(String each:instruction){
-			each=each.trim();
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
 		}
 		
 		String operand1 = "", operand2 = "", afterBranchLabel = "";
@@ -264,8 +264,8 @@ public class Backend {
 	 */
 	private void addArrayStore2(String line) {
 		String[] instruction = line.split(",");
-		for(String each:instruction){
-			each=each.trim();
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
 		}
 		
 		String arrName = "", offset = "", storeFrom = "";
@@ -293,8 +293,8 @@ public class Backend {
 	 */
 	private void addArrayLoad2(String line) {
 		String[] instruction = line.split(",");
-		for(String each:instruction){
-			each=each.trim();
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
 		}
 		
 		String loadTo = "", array = "", offset = "";

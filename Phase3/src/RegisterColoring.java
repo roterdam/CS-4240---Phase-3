@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This is the class that will take in a block and then read its information to
  * create a graph out of the registers and color them appropriately
@@ -16,7 +20,7 @@ public class RegisterColoring {
 	}
 
 	/**
-	 * So in order to make the IR code, we first need to look at the block. In
+	 * So in order to make the IR code, we first need to look at the block. Inx
 	 * the block, look at each line of code. Take each line of code and change
 	 * all of the variables to registers. Once these registers are made, we need
 	 * to create a livelyhood chart for each register. After the chart is made,
@@ -25,17 +29,103 @@ public class RegisterColoring {
 	 * regiters back inthe IR code and return it.
 	 */
 	public String makeIRCode() {
-		Backend backend = new Backend();
+		// get the irCoe from a block
 		String[] lines = theBlock.getIrCode().split("\n");
-		for(String each:lines){
-			System.out.println("Line is: "+each);
-			backend.parseLine(each, theBlock);
-			System.out.println("IR Nodes are: ");
-			for(Backend.IRnode eachNode: (backend.irNodes)){
-				System.out.println(eachNode.toString());
+		// for each line, change variables into registers
+		ArrayList<RegisterNode> registers = new ArrayList<RegisterNode>();
+		for (int i = 0; i < lines.length; i++) {
+			ArrayList<RegisterNode> currentRegisters = makeRegisters(lines[i],
+					i);
+			for (RegisterNode each : currentRegisters) {
+				System.out.println(each.getvariable() + " : "
+						+ each.getLineNumber());
+				// registers.add(each);
 			}
 		}
-		//get the irNodes
 		return "";
+	}
+
+	/**
+	 * This will go through an instruction and make registers using variables
+	 * from the instruction
+	 * 
+	 * @param line
+	 * @param lineNumber
+	 * @return
+	 */
+	private ArrayList<RegisterNode> makeRegisters(String line, int lineNumber) {
+		ArrayList<RegisterNode> list = new ArrayList<RegisterNode>();
+		// split up the instruction and get rid of white space
+		String[] instruction = line.split(",");
+		for (int i=0;i<instruction.length;i++) {
+			instruction[i] = instruction[i].trim();
+		}
+
+		// binary operations
+		List<String> binaryOp = Arrays.asList("add", "sub", "mult", "div",
+				"and", "or");
+		// branching
+		List<String> branchOp = Arrays.asList("breq", "brneq", "brlt", "brgt",
+				"brgeq", "brleq");
+		
+		// *************Make Some Registers ************************
+		if (binaryOp.contains(instruction[0])) {
+			// this is a binary operation
+			// op, x, y, z
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+			list.add(new RegisterNode(instruction[2], lineNumber, ""));
+			try {
+				Integer.parseInt(instruction[3]);
+			} catch (Exception e) {
+				list.add(new RegisterNode(instruction[3], lineNumber, ""));
+			}
+		}
+		if (branchOp.contains(instruction[0])) {
+			// this is a branch operation
+			// op, y, z, label
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+			try {
+				Integer.parseInt(instruction[2]);
+			} catch (Exception e) {
+				list.add(new RegisterNode(instruction[2], lineNumber, ""));
+			}
+		}
+		if (instruction[0].equals("assign")) {
+			// this is an assign operation
+			// op, x, y,
+			// op,x, size, value,
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+			if (instruction.length == 3) {
+				try {
+					Integer.parseInt(instruction[2]);
+				} catch (NumberFormatException e) {
+					list.add(new RegisterNode(instruction[2], lineNumber, ""));
+				}
+			}
+		}
+		if (instruction[0].equals("return")) {
+			// this is a return operation
+			// op, x,
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+		}
+		if (instruction[0].equals("callr")) {
+			// this is a callr instruction
+			// op,x,func,param...
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+		}
+		if (instruction[0].equals("array_store")) {
+			// this is an array store
+			// op, arrayname,offset,x,
+			list.add(new RegisterNode(instruction[3], lineNumber, ""));
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+		}
+		if (instruction[0].equals("array_load")) {
+			// this is an array load
+			// op, x, arrayname, offset
+			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+			list.add(new RegisterNode(instruction[2], lineNumber, ""));
+		}
+
+		return list;
 	}
 }
