@@ -22,22 +22,12 @@ public class RegisterAllocation {
 		// now we need to make the blocks
 		HashSet<CFGNode> blocks = cfg.buildBlocks(leaders, ex1);
 		CFGNode graph = cfg.createEdges(blocks,ex1);
-		
-		//Print out basic blocks
-//		for(CFGNode each:blocks){
-//			System.out.println("------This block--------");
-//			System.out.println(each);
-//			System.out.println("-----Can Go To ---------");
-//			for(CFGNode eachNext:each.getNextBlock()){
-//				System.out.println(eachNext);
-//			}
-//		}
-//		
+
 		//let's start playing with registers now
 		for(CFGNode each:blocks){
 			RegisterColoring colorMe = new RegisterColoring(each);
 			System.out.println("****");
-			colorMe.makeIRCode();
+			colorMe.makeNewIRCode();
 		}
 	}
 }

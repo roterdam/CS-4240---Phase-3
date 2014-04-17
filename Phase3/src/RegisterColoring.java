@@ -28,7 +28,7 @@ public class RegisterColoring {
 	 * number of colors is the real number of registers we need. Then we put the
 	 * regiters back inthe IR code and return it.
 	 */
-	public String makeIRCode() {
+	public String makeNewIRCode() {
 		// get the irCoe from a block
 		String[] lines = theBlock.getIrCode().split("\n");
 
@@ -49,16 +49,6 @@ public class RegisterColoring {
 		// use the registers's liveliness to determine neighbors in a graph
 		registers = determineNeighbors(registers);
 
-		System.out.println("-----Neighbors----");
-		for (RegisterNode each : registers) {
-			System.out.print(each.getvariable() + ": {");
-			for (RegisterNode eachNeighbor : each.getNeighbors()) {
-				System.out.print(eachNeighbor.getvariable());
-				System.out.print(",");
-			}
-			System.out.println("}");
-		}
-
 		// next, color the graph!
 		registers = colorRegisters(registers);
 		
@@ -66,7 +56,9 @@ public class RegisterColoring {
 		for (RegisterNode each : registers) {
 			System.out.println(each.getvariable()+": "+each.getColor());
 		}
-		return "";
+		
+		String newIRCode = makeIRCode(registers, theBlock.getIrCode());
+		return newIRCode;
 	}
 
 	/**
@@ -142,12 +134,22 @@ public class RegisterColoring {
 			// op, arrayname,offset,x,
 			list.add(new RegisterNode(instruction[3], lineNumber, ""));
 			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+			try {
+				Integer.parseInt(instruction[2]);
+			} catch (NumberFormatException e) {
+				list.add(new RegisterNode(instruction[2], lineNumber, ""));
+			}
 		}
 		if (instruction[0].equals("array_load")) {
 			// this is an array load
 			// op, x, arrayname, offset
 			list.add(new RegisterNode(instruction[1], lineNumber, ""));
 			list.add(new RegisterNode(instruction[2], lineNumber, ""));
+			try {
+				Integer.parseInt(instruction[3]);
+			} catch (NumberFormatException e) {
+				list.add(new RegisterNode(instruction[3], lineNumber, ""));
+			}
 		}
 
 		return list;
@@ -257,7 +259,22 @@ public class RegisterColoring {
 				}
 			}
 		}
-
 		return registers;
+	}
+	
+	/**
+	 * This will take in the irCode from a block and replace the variables with registers
+	 * @param registers
+	 * @return
+	 */
+	private String makeIRCode(ArrayList<RegisterNode> registers, String code){
+		System.out.println(code);
+		for(RegisterNode each: registers){
+			code=code.replace(each.getvariable()+",", "$r"+each.getColor()+",");
+			code=code.replace(", "+each.getvariable(), ", $r"+each.getColor());
+		}
+		System.out.println("****************************");
+		System.out.println(code);
+		return code;
 	}
 }
