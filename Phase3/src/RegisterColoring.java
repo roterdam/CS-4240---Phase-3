@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Stack;
 
 /**
  * This is the class that will take in a block and then read its information to
@@ -45,18 +49,30 @@ public class RegisterColoring {
 
 		// now use the registers to determine liveliness
 		registers = determineLiveliness(registers);
-
+		System.out.println("-----Liveliness-----");
+		for (RegisterNode each : registers) {
+			System.out.println(each.getvariable() + ": {" + each.getFirst()
+					+ "," + each.getLast() + "}");
+		}
 		// use the registers's liveliness to determine neighbors in a graph
 		registers = determineNeighbors(registers);
+		System.out.println("-----Neighbors------");
+		for (RegisterNode each : registers) {
+			System.out.print(each.getvariable() + ": {");
+			for (RegisterNode eachN : each.getNeighbors()) {
+				System.out.print(eachN.getvariable() + ",");
+			}
+			System.out.println("}");
+		}
 
 		// next, color the graph!
 		registers = colorRegisters(registers);
-		
+
 		System.out.println("------Colors------");
 		for (RegisterNode each : registers) {
-			System.out.println(each.getvariable()+": "+each.getColor());
+			System.out.println(each.getvariable() + ": " + each.getColor());
 		}
-		
+
 		String newIRCode = makeIRCode(registers, theBlock.getIrCode());
 		return newIRCode;
 	}
@@ -221,9 +237,10 @@ public class RegisterColoring {
 
 				if (firstNode != checkNode
 						&& checkNode.getFirst() >= firstNode.getFirst()
-						&& checkNode.getFirst() <= firstNode.getLast()
-						&& (checkNode.getLast() <= firstNode.getLast() || checkNode
-								.getLast() > firstNode.getLast())) {
+						&& checkNode.getFirst() <= firstNode.getLast()) {
+					// && (checkNode.getLast() <= firstNode.getLast() ||
+					// checkNode
+					// .getLast() > firstNode.getLast())) {
 					// means they are neighbors!
 					firstNode.addNeighbor(checkNode);
 					checkNode.addNeighbor(firstNode);
@@ -232,6 +249,18 @@ public class RegisterColoring {
 		}
 
 		return registers;
+	}
+
+	/**
+	 * Sorts register nodes in decreasing order
+	 * 
+	 * @author Crystal
+	 * 
+	 */
+	static class PQsort implements Comparator<RegisterNode> {
+		public int compare(RegisterNode o1, RegisterNode o2) {
+			return o2.getNeighbors().size() - o1.getNeighbors().size();
+		}
 	}
 
 	/**
@@ -245,33 +274,84 @@ public class RegisterColoring {
 	 */
 	private ArrayList<RegisterNode> colorRegisters(
 			ArrayList<RegisterNode> registers) {
-		int color = 1;
+		// Comparator
+		PQsort pqs = new PQsort();
 
+		// Given G=(V,E):
+		// Compute Degree(v) for all v in V.
+		// Set uncolored = V sorted in decreasing order of Degree(v).
+		PriorityQueue<RegisterNode> uncolored = new PriorityQueue<RegisterNode>(
+				5, pqs);
 		for (RegisterNode each : registers) {
-			if (each.getColor() == 0) {
-				color = 1;
-				each.setColor(color);
-				for (RegisterNode neighbor : each.getNeighbors()) {
-					if (neighbor.getColor() != 0) {
-						color++;
-						neighbor.setColor(color);
-					}
+			uncolored.add(each);
+		}
+		// set currentColor = 0.
+		int currentColor = 0;
+		ArrayList<RegisterNode> removeMe = new ArrayList<RegisterNode>();
+
+		// while there are uncolored nodes:
+		while (!uncolored.isEmpty()) {
+
+			// remove anything that needs removed
+			for (RegisterNode each : removeMe) {
+				if (each != null) {
+					uncolored.remove(each);
 				}
 			}
+			removeMe.clear();
+			if (!uncolored.isEmpty()) {
+				// set A=first element of uncolored
+				// remove A from uncolored
+				RegisterNode A = uncolored.poll();
+				// set Color(A) = currentColor
+				A.setColor(currentColor);
+				// set coloredWithCurrent = {A}
+				ArrayList<RegisterNode> coloredWithCurrent = new ArrayList<RegisterNode>();
+				coloredWithCurrent.add(A);
+				// for each v in uncolored:
+				for (RegisterNode v : uncolored) {
+					// if v is not adjacent to anything in coloredWithCurrent:
+					int notAdjacent = 1;
+
+					if (!v.getNeighbors().isEmpty()) {
+						for (RegisterNode each : v.getNeighbors()) {
+							if (coloredWithCurrent.contains(each)) {
+								notAdjacent = 0;
+							}
+						}
+					}
+					if (notAdjacent == 1) {
+						// set Color(v)=currentColor.
+						v.setColor(currentColor);
+						// add v to currentColor.
+						coloredWithCurrent.add(v);
+						// remove v from uncolored.
+						removeMe.add(v);
+					}// end if
+				}// end for
+					// currentColor = currentColor + 1.
+				currentColor = currentColor + 1;
+			}
+			// end while
 		}
+
 		return registers;
 	}
-	
+
 	/**
-	 * This will take in the irCode from a block and replace the variables with registers
+	 * This will take in the irCode from a block and replace the variables with
+	 * registers
+	 * 
 	 * @param registers
 	 * @return
 	 */
-	private String makeIRCode(ArrayList<RegisterNode> registers, String code){
+	private String makeIRCode(ArrayList<RegisterNode> registers, String code) {
 		System.out.println(code);
-		for(RegisterNode each: registers){
-			code=code.replace(each.getvariable()+",", "$r"+each.getColor()+",");
-			code=code.replace(", "+each.getvariable(), ", $r"+each.getColor());
+		for (RegisterNode each : registers) {
+			code = code.replace(each.getvariable() + ",",
+					"$r" + each.getColor() + ",");
+			code = code.replace(", " + each.getvariable(),
+					", $r" + each.getColor());
 		}
 		System.out.println("****************************");
 		System.out.println(code);
