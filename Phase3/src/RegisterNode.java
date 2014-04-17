@@ -22,6 +22,7 @@ public class RegisterNode {
 		this.setvariable(variable);
 		setLineNumber(line);
 		this.setType(type);
+		neighbors = new ArrayList<RegisterNode>();
 	}
 
 	public String getvariable() {
@@ -37,7 +38,9 @@ public class RegisterNode {
 	}
 
 	public void addNeighbor(RegisterNode neighbor) {
-		this.neighbors.add(neighbor);
+		if(!this.neighbors.contains(neighbor)){
+			this.neighbors.add(neighbor);
+		}
 	}
 
 	public int getColor() {

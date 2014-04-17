@@ -31,6 +31,7 @@ public class RegisterColoring {
 	public String makeIRCode() {
 		// get the irCoe from a block
 		String[] lines = theBlock.getIrCode().split("\n");
+
 		// for each line, change variables into registers
 		ArrayList<RegisterNode> registers = new ArrayList<RegisterNode>();
 		for (int i = 0; i < lines.length; i++) {
@@ -41,17 +42,24 @@ public class RegisterColoring {
 				registers.add(each);
 			}
 		}
-		// look at the registers that have been made from that block
-		for (RegisterNode each : registers) {
-			System.out.println(each.getvariable() + " : "
-					+ each.getLineNumber());
-		}
 
 		// now use the registers to determine liveliness
-		registers= determineLiveliness(registers);
+		registers = determineLiveliness(registers);
 		System.out.println("*********Liveliness********");
-		for(RegisterNode each:registers){
-			System.out.println(each.getvariable()+" : {"+each.getFirst()+" , "+each.getLast()+"}");
+		for (RegisterNode each : registers) {
+			System.out.println(each.getvariable() + " : {" + each.getFirst()
+					+ " , " + each.getLast() + "}");
+		}
+		// use the registers's liveliness to determine neighbors in a graph
+		registers = determineNeighbors(registers);
+		System.out.println("-----Neighbors----");
+		for (RegisterNode each : registers) {
+			System.out.print(each.getvariable() + ": {");
+			for (RegisterNode eachNeighbor : each.getNeighbors()) {
+				System.out.print(eachNeighbor.getvariable());
+				System.out.print(",");
+			}
+			System.out.println("}");
 		}
 		return "";
 	}
@@ -168,24 +176,54 @@ public class RegisterColoring {
 					if (first == 9999) {// not assigned yet
 						first = eachNode.getLineNumber();
 					}
-					//determine the last occurance
-					if(last==9999){
+					// determine the last occurance
+					if (last == 9999) {
 						last = eachNode.getLineNumber();
-					}
-					else{
-						if(eachNode.getLineNumber()>last){
-							last=eachNode.getLineNumber();
+					} else {
+						if (eachNode.getLineNumber() > last) {
+							last = eachNode.getLineNumber();
 						}
 					}
 				}
 			}
-			//make a new node with that variable and it's first
-			RegisterNode node = new RegisterNode(each,first,"");
+			// make a new node with that variable and it's first
+			RegisterNode node = new RegisterNode(each, first, "");
 			node.setFirst(first);
 			node.setLast(last);
 			newRegisters.add(node);
 		}
 
 		return newRegisters;
+	}
+
+	/**
+	 * Use the liveliness of the registers to determine which ones are neighbors
+	 * in a graph. To do this, look at each node's first and last occurance. If
+	 * another node has a first or last in that range, then it is a neighbor.
+	 * 
+	 * @param registers
+	 * @return
+	 */
+	private ArrayList<RegisterNode> determineNeighbors(
+			ArrayList<RegisterNode> registers) {
+
+		for (int i = 0; i < registers.size(); i++) {
+			for (int j = 1; j < registers.size(); j++) {
+				RegisterNode firstNode = registers.get(i);
+				RegisterNode checkNode = registers.get(j);
+
+				if (firstNode != checkNode
+						&& checkNode.getFirst() >= firstNode.getFirst()
+						&& checkNode.getFirst() <= firstNode.getLast()
+						&& (checkNode.getLast() <= firstNode.getLast() || 
+							checkNode.getLast() > firstNode.getLast())) {
+					// means they are neighbors!
+					firstNode.addNeighbor(checkNode);
+					checkNode.addNeighbor(firstNode);
+				}
+			}
+		}
+
+		return registers;
 	}
 }
