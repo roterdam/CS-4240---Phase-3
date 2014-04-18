@@ -21,13 +21,15 @@ public class RegisterAllocation {
 		HashSet<String> leaders = cfg.findLeaders(ex1);
 		// now we need to make the blocks
 		HashSet<CFGNode> blocks = cfg.buildBlocks(leaders, ex1);
+		//make a connected graph of blocks
 		CFGNode graph = cfg.createEdges(blocks,ex1);
 
 		//let's start playing with registers now
 		for(CFGNode each:blocks){
 			RegisterColoring colorMe = new RegisterColoring(each);
-			System.out.println("****");
-			colorMe.makeNewIRCode();
+			each.setIrCode(colorMe.makeNewIRCode());
 		}
+		
+		System.out.println(cfg.printOutNewCode(blocks));
 	}
 }

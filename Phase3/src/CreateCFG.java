@@ -3,6 +3,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import sun.misc.Queue;
+
 /**
  * This is the main class that will be used to create a Control Flow Graph
  * 
@@ -27,6 +29,7 @@ public class CreateCFG {
 
 		HashSet<CFGNode> blocks = new HashSet<CFGNode>();
 		String[] lines = irCode.split("\n");
+		int blockNum=0;
 
 		for (int j = 0; j < leaders.size(); j++) { // for each leader
 			String blockCode = leaderList.get(j);
@@ -54,9 +57,19 @@ public class CreateCFG {
 					found = 1;
 				}
 				// let it go
-
 			}
-			blocks.add(new CFGNode(blockCode));
+			blocks.add(new CFGNode(blockCode,0));
+		}
+		
+		//now assign block numbers to each block
+		int num=1;
+		for(String line:lines){
+			for(CFGNode each:blocks){
+				if(each.getIrCode().contains(line) && each.getBlockNumber()==0){
+					each.setBlockNumber(num);
+					num++;
+				}
+			}
 		}
 
 		return blocks;
@@ -212,40 +225,40 @@ public class CreateCFG {
 			if (line.contains("breq") || line.contains("brneq")
 					|| line.contains("brlt") || line.contains("brgt")
 					|| line.contains("brgeq") || line.contains("brleq")) {
-				//find the block with that line
-				CFGNode block =null;
-				for(CFGNode eachBlock:blocks){
-					if(eachBlock.toString().contains(line)){
-						block=eachBlock;
+				// find the block with that line
+				CFGNode block = null;
+				for (CFGNode eachBlock : blocks) {
+					if (eachBlock.toString().contains(line)) {
+						block = eachBlock;
 						break;
 					}
 				}
 				// Figure out where the br is going to...
 				String[] branch = line.split(",");
 				String where = branch[3].trim();
-				//find the node with that
-				for(CFGNode eachNode:blocks){
-					if(eachNode.toString().contains(where+":")){
+				// find the node with that
+				for (CFGNode eachNode : blocks) {
+					if (eachNode.toString().contains(where + ":")) {
 						block.setNextBlock(eachNode);
 						break;
 					}
 				}
 			}
-			if(line.contains("goto")){
-				//find the block with that line
-				CFGNode block =null;
-				for(CFGNode eachBlock:blocks){
-					if(eachBlock.toString().contains(line)){
-						block=eachBlock;
+			if (line.contains("goto")) {
+				// find the block with that line
+				CFGNode block = null;
+				for (CFGNode eachBlock : blocks) {
+					if (eachBlock.toString().contains(line)) {
+						block = eachBlock;
 						break;
 					}
 				}
 				// Figure out where the goto is going to...
 				String[] goingTo = line.split(",");
 				String where = goingTo[1].trim();
-				//find the node with that
-				for(CFGNode eachNode:blocks){
-					if(eachNode.toString().contains(where+":")){
+				// find the node with that
+				for (CFGNode eachNode : blocks) {
+					if (eachNode.toString().contains(where + ":")) {
 						block.setNextBlock(eachNode);
 						break;
 					}
@@ -253,5 +266,27 @@ public class CreateCFG {
 			}
 		}
 		return startNode;
+	}
+
+	/**
+	 * This method will go through and print out the ir code in order
+	 * 
+	 * @param ex1
+	 * @param blocks
+	 */
+	public String printOutNewCode(HashSet<CFGNode> blocks) {
+		String ircode="";
+		int num=1;
+		while(num<blocks.size()+1){
+			for(CFGNode each:blocks){
+				if(each.getBlockNumber()==num){
+					ircode=ircode+"\n"+each.getIrCode();
+				}
+			}
+			num++;
+		}
+		
+		ircode=ircode.replaceFirst("\n", "");
+		return ircode;
 	}
 }

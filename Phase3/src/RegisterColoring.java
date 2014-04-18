@@ -49,29 +49,10 @@ public class RegisterColoring {
 
 		// now use the registers to determine liveliness
 		registers = determineLiveliness(registers);
-		System.out.println("-----Liveliness-----");
-		for (RegisterNode each : registers) {
-			System.out.println(each.getvariable() + ": {" + each.getFirst()
-					+ "," + each.getLast() + "}");
-		}
 		// use the registers's liveliness to determine neighbors in a graph
 		registers = determineNeighbors(registers);
-		System.out.println("-----Neighbors------");
-		for (RegisterNode each : registers) {
-			System.out.print(each.getvariable() + ": {");
-			for (RegisterNode eachN : each.getNeighbors()) {
-				System.out.print(eachN.getvariable() + ",");
-			}
-			System.out.println("}");
-		}
-
 		// next, color the graph!
 		registers = colorRegisters(registers);
-
-		System.out.println("------Colors------");
-		for (RegisterNode each : registers) {
-			System.out.println(each.getvariable() + ": " + each.getColor());
-		}
 
 		String newIRCode = makeIRCode(registers, theBlock.getIrCode());
 		return newIRCode;
@@ -346,15 +327,12 @@ public class RegisterColoring {
 	 * @return
 	 */
 	private String makeIRCode(ArrayList<RegisterNode> registers, String code) {
-		System.out.println(code);
 		for (RegisterNode each : registers) {
 			code = code.replace(each.getvariable() + ",",
 					"$r" + each.getColor() + ",");
 			code = code.replace(", " + each.getvariable(),
 					", $r" + each.getColor());
 		}
-		System.out.println("****************************");
-		System.out.println(code);
 		return code;
 	}
 }
