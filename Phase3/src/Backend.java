@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import CFG.CFGNode;
+
 public class Backend {
 
 	Scanner irScanner;

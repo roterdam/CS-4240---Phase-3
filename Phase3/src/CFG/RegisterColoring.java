@@ -1,3 +1,4 @@
+package CFG;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -328,10 +329,8 @@ public class RegisterColoring {
 	 */
 	private String makeIRCode(ArrayList<RegisterNode> registers, String code) {
 		for (RegisterNode each : registers) {
-			code = code.replace(each.getvariable() + ",",
-					"$r" + each.getColor() + ",");
 			code = code.replace(", " + each.getvariable(),
-					", $r" + each.getColor());
+					", $t" + each.getColor());
 		}
 		return code;
 	}

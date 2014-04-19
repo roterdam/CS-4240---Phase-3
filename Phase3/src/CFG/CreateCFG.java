@@ -1,3 +1,4 @@
+package CFG;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -280,7 +281,7 @@ public class CreateCFG {
 		while(num<blocks.size()+1){
 			for(CFGNode each:blocks){
 				if(each.getBlockNumber()==num){
-					ircode=ircode+"\n"+each.getIrCode();
+					ircode=ircode+"\n***\n"+each.getIrCode();
 				}
 			}
 			num++;
