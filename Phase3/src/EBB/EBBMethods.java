@@ -23,7 +23,7 @@ public class EBBMethods {
 	 * @param bBroot
 	 * @return
 	 */
-	public ArrayList<EBBNode> createEBBs(CFGNode bBroot) {
+	public ArrayList<EBBNode> createEBBs(CFGNode bBroot, CFGNode successor, CFGNode predicessor) {
 		return Build_All_Ebbs(entry,entry.getNextBlock(),null);
 	}
 	
@@ -37,7 +37,7 @@ public class EBBMethods {
 
 		while(!EbbRoots.isEmpty()){
 			x = EbbRoots.poll();
-			if()
+			//if()
 		}
 		return nodes;
 	}
