@@ -1,0 +1,20 @@
+assign, X, 10,
+assign, Y, 10,
+assign, i, 0,
+assign, sum, 0,
+main:
+add, X, 1, t0
+brlt, a, b, end
+brgt, z, x, begin
+brgeq, x, y, middle
+add, X, Y, t1
+mult, i, sum, t2
+sub, t1, t2, t3
+brneq, a, b, later
+goto, after_loop, ,
+brleq, a, b, begin_of_loop
+after_loop:
+breq, a, b, after_if
+return, a, ,
+array_store, arr, 0, a
+array_load, a, arr, 0

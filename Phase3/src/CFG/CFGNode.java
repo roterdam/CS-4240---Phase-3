@@ -1,3 +1,4 @@
+package CFG;
 import java.util.LinkedList;
 
 /**
@@ -9,18 +10,23 @@ public class CFGNode {
 	/**
 	 * The large string of information inside of a basic block
 	 */
-	private String IRcode;
+	private String IRcode,load,store;
 	/**
 	 * The next basic block
 	 */
 	private LinkedList<CFGNode> nextBlock;
 	/**
+	 * For ordering blocks
+	 */
+	private int blockNumber;
+	/**
 	 * Cnstructor
 	 * @param code
 	 */
-	public CFGNode(String code){
+	public CFGNode(String code,int blockNumber){
 		IRcode=code;
 		nextBlock=new LinkedList<CFGNode>();
+		this.setBlockNumber(blockNumber);
 	}
 	/**
 	 *
@@ -50,5 +56,35 @@ public class CFGNode {
 		return "[**********\n"+ IRcode +"\n**********]";
 		 
 	 }
+	 
+	 /**
+	  * This will return the IRCode in the block, separated by \n for each line
+	  * @return
+	  */
+	 public String getIrCode(){
+		 return IRcode;
+	 }
+	 
+	 public void setIrCode(String code){
+		 IRcode=code;
+	 }
+	public String getLoad() {
+		return load;
+	}
+	public void setLoad(String load) {
+		this.load = load;
+	}
+	public String getStore() {
+		return store;
+	}
+	public void setStore(String store) {
+		this.store = store;
+	}
+	public int getBlockNumber() {
+		return blockNumber;
+	}
+	public void setBlockNumber(int blockNumber) {
+		this.blockNumber = blockNumber;
+	}
 
 }
