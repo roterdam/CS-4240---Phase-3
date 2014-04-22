@@ -7,25 +7,21 @@ public class Instructions {
 	//private IROPCODE irOp;
 	private MIPSOPCODE mipsOp;
 	private REGISTERS regX, regY, regZ;
-	private String immediateL, immediateR, label;
+	private String offset;
+	private static String immediate;
+	private String label;
+	private String text;
 	
 	public Instructions(IROPCODE op, REGISTERS regX, REGISTERS regY, REGISTERS regZ, 
-			String immediateL, String immediateR, String label) {
+			String offset, String immediate, String label) {
 		this.mipsOp = mips(op);
 		this.regX = regX;
 		this.regY = regY;
 		this.regZ = regZ;
-		this.immediateL = immediateL;
-		this.immediateR = immediateR;
+		this.offset = offset;
+		this.immediate = immediate;
 		this.label = label;
 	}
-	
-	/*public IROPCODE getIROp() {
-		return irOp;
-	}
-	public void setIROp(IROPCODE irOp) {
-		this.irOp = irOp;
-	}*/
 	
 	public MIPSOPCODE getMipsOp() {
 		return mipsOp;
@@ -51,52 +47,57 @@ public class Instructions {
 	public void setRegZ(REGISTERS regZ) {
 		this.regZ = regZ;
 	}
-	public String getImmeR() {
-		return immediateR;
+	public String getImmediate() {
+		return immediate;
 	}
-	public void setImmeR(String immediate) {
-		this.immediateR = immediate;
+	public void setImmediate(String immediate) {
+		this.immediate = immediate;
 	}
-	
-	public String getImmeL() {
-		return immediateL;
+	public String getOffset() {
+		return offset;
 	}
-	public void setImmeL(String immediate) {
-		this.immediateL = immediate;
+	public void setOffset(String offset) {
+		this.offset = offset;
 	}
-	
 	public String getLabel() {
 		return label;
 	}
-
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	public String getText() {
+		return label;
+	}
+	public void setText(String txt) {
+		this.text = txt;
 	}
 	
 	@Override
 	public String toString() {
-		if ((regX == null) && (regY == null) && (regZ == null) && (immediateR == null) && (label == null)) {
+		if ((regX == null) && (regY == null) && (regZ == null) && (immediate == null) && (label == null) && (offset == null)) {
 			return ("\t" + mipsOp);
-		} else if ((regY == null) && (regZ == null) && (immediateR == null) && (label == null)) {
+		} else if ((mipsOp == null) && (regX == null) && (regY == null) && (regZ == null) && (immediate == null) && (offset == null)) {
+			return ("" + label + ":");
+		} else if ((regY == null) && (regZ == null) && (immediate == null) && (label == null) && (offset == null)) {
 			return ("\t" + mipsOp + " " + regX);
-		} else if ((regX == null) && (regY == null) && (regZ == null) && (immediateR == null)) {
+		} else if ((regX == null) && (regY == null) && (regZ == null) && (immediate == null) && (offset == null)) {
 				return ("\t" + mipsOp + " " + label);
-		} else if ((regY == null) && (regZ == null) && (immediateR == null)) {
+		} else if ((regY == null) && (regZ == null) && (immediate == null) && (offset == null)) {
 			return ("\t" + mipsOp + " " + regX + " " + label);
-		} else if ((regY == null) && (regZ == null)) {
-				return ("\t" + mipsOp + " " + regX + " " + immediateR + " " + label);
-		} else if ((regY == null) && (regZ == null) && (label == null)) {
-				return ("\t" + mipsOp + " " + regX + " " + immediateR);
-		} else if ((regZ == null) && (immediateR == null) && (label == null)) {
+		} else if ((regY == null) && (regZ == null) && (offset == null)) {
+				return ("\t" + mipsOp + " " + regX + " " + immediate + " " + label);	//for conditional branch
+		} else if ((regY == null) && (regZ == null) && (label == null) && (offset == null)) {
+				return ("\t" + mipsOp + " " + regX + " " + immediate);
+		} else if ((regZ == null) && (immediate == null) && (label == null) && (offset == null)) {
 			return ("\t" + mipsOp + " " + regX + " " + regY);
-		} else if ((regZ == null) && (immediateL != null) && (immediateR == null) && (label == null)) {
-			return ("\t" + mipsOp + " " + regX + immediateL + "(" + regY + ")");
-		} else if ((immediateR == null) && (label == null)) {
+		} else if ((regZ == null) && (offset != null) && (immediate == null) && (label == null)) {
+			return ("\t" + mipsOp + " " + regX + offset + "(" + regY + ")");
+		} else if ((immediate == null) && (label == null) && (offset == null)) {
 			return ("\t" + mipsOp + " " + regX + " " + regY + " " + regZ);
-		} else if ((regZ == null) && (label == null)){
-			return ("\t" + mipsOp + " " + regX + " " + regY + " " + immediateR);
+		} else if ((regZ == null) && (label == null) && (offset == null)){
+			return ("\t" + mipsOp + " " + regX + " " + regY + " " + immediate);
 		} else {
-			return null;
+			return ("\t" + text);
 		}
 	}
 	
@@ -104,8 +105,14 @@ public class Instructions {
 		switch (op) {
 			case ASSIGN:
 				return null;
+			case STORE:
+				return sw;
 			case ADD:
-				return add;
+				if (immediate != null) {
+					return addi;
+				} else {
+					return add;
+				}
 			case SUB:
 				return sub;
 			case MULT:
@@ -113,9 +120,17 @@ public class Instructions {
 			case DIV:
 				return div;
 			case AND:
-				return and;
+				if (immediate != null) {
+					return andi;
+				} else {
+					return and;
+				}
 			case OR:
-				return or;
+				if (immediate != null) {
+					return ori;
+				} else {
+					return or;
+				}
 			case GOTO:
 				return b;
 			case BREQ:

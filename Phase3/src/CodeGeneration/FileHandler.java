@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class FileHandler implements AutoCloseable{
-	public static final String FILE_TYPE = ".txt";
+	public static final String FILE_TYPE = ".ir";
 	public static final String OUTPUT_TYPE= ".s";
 	private boolean redirectedConsole;
 	private PrintStream out;

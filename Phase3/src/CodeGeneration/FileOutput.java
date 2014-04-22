@@ -8,8 +8,6 @@ public class FileOutput {
 			CodeGeneration cg = new CodeGeneration();
 			fh.redirectConsole();
 			
-			System.out.println("\t.text");
-			System.out.println("\t.glbl main");
 			for(Instructions i : cg.instructionList()){
 				System.out.println(i.toString());	
 			}
