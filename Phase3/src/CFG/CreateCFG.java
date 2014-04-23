@@ -1,4 +1,5 @@
 package CFG;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,7 +31,7 @@ public class CreateCFG {
 
 		HashSet<CFGNode> blocks = new HashSet<CFGNode>();
 		String[] lines = irCode.split("\n");
-		int blockNum=0;
+		int blockNum = 0;
 
 		for (int j = 0; j < leaders.size(); j++) { // for each leader
 			String blockCode = leaderList.get(j);
@@ -59,14 +60,15 @@ public class CreateCFG {
 				}
 				// let it go
 			}
-			blocks.add(new CFGNode(blockCode,0));
+			blocks.add(new CFGNode(blockCode, 0));
 		}
-		
-		//now assign block numbers to each block
-		int num=1;
-		for(String line:lines){
-			for(CFGNode each:blocks){
-				if(each.getIrCode().contains(line) && each.getBlockNumber()==0){
+
+		// now assign block numbers to each block
+		int num = 1;
+		for (String line : lines) {
+			for (CFGNode each : blocks) {
+				if (each.getIrCode().contains(line)
+						&& each.getBlockNumber() == 0) {
 					each.setBlockNumber(num);
 					num++;
 				}
@@ -131,15 +133,13 @@ public class CreateCFG {
 					}
 				}
 			}
-			// //This is "Return"
-			// if (lines[i].contains("call")) {
+			//This is "Return"
+			if (lines[i].contains("call")) {
 			// // OBEY rule 3
-			// if ((i + 1) >= lines.length) {
-			// theLeaders.add("End of Code");
-			// } else {
-			// theLeaders.add(lines[i + 1]);
-			// }
-			// }
+			if ((i + 1) <= lines.length-1) {
+				theLeaders.add(lines[i + 1]);
+			}
+			}
 		}
 		return theLeaders;
 	}
@@ -276,18 +276,18 @@ public class CreateCFG {
 	 * @param blocks
 	 */
 	public String printOutNewCode(HashSet<CFGNode> blocks) {
-		String ircode="";
-		int num=1;
-		while(num<blocks.size()+1){
-			for(CFGNode each:blocks){
-				if(each.getBlockNumber()==num){
-					ircode=ircode+"\n***\n"+each.getIrCode();
+		String ircode = "";
+		int num = 1;
+		while (num < blocks.size() + 1) {
+			for (CFGNode each : blocks) {
+				if (each.getBlockNumber() == num) {
+					ircode = ircode + "\n***\n" + each.getIrCode();
 				}
 			}
 			num++;
 		}
-		
-		ircode=ircode.replaceFirst("\n", "");
+
+		ircode = ircode.replaceFirst("\n", "");
 		return ircode;
 	}
 }

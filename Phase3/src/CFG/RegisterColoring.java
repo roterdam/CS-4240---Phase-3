@@ -1,4 +1,5 @@
 package CFG;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -104,12 +105,27 @@ public class RegisterColoring {
 				list.add(new RegisterNode(instruction[2], lineNumber, ""));
 			}
 		}
-		if (instruction[0].equals("assign")) {
-			// this is an assign operation
-			// op, x, y,
-			// op,x, size, value,
-			list.add(new RegisterNode(instruction[1], lineNumber, ""));
-			if (instruction.length == 3) {
+		// if (instruction[0].equals("assign")) {
+		// // this is an assign operation
+		// // op, x, y,
+		// // op,x, size, value,
+		// list.add(new RegisterNode(instruction[1], lineNumber, ""));
+		// if (instruction.length == 3) {
+		// try {
+		// Integer.parseInt(instruction[2]);
+		// } catch (NumberFormatException e) {
+		// list.add(new RegisterNode(instruction[2], lineNumber, ""));
+		// }
+		// }
+		// }
+		if (instruction.length > 1) {
+			if (instruction[1].contains(".space")
+					|| instruction[1].contains(".word")
+					|| instruction[1].contains(".byte")) {
+				// this is an assign operation
+				// var:, op, size/value
+				String inst = instruction[0].replace(":", "");
+				list.add(new RegisterNode(inst,lineNumber, ""));
 				try {
 					Integer.parseInt(instruction[2]);
 				} catch (NumberFormatException e) {
@@ -126,6 +142,11 @@ public class RegisterColoring {
 			// this is a callr instruction
 			// op,x,func,param...
 			list.add(new RegisterNode(instruction[1], lineNumber, ""));
+		}
+		if (instruction[0].equals("call")) {
+			// this is a call instruction
+			// op,func,param...
+			list.add(new RegisterNode(instruction[2], lineNumber, ""));
 		}
 		if (instruction[0].equals("array_store")) {
 			// this is an array store
@@ -328,9 +349,25 @@ public class RegisterColoring {
 	 * @return
 	 */
 	private String makeIRCode(ArrayList<RegisterNode> registers, String code) {
+		//determine the number of registers needed for the block
+		int colors=-1;
+		for(RegisterNode each:registers){
+			if(each.getColor()>colors){
+				colors = each.getColor();
+			}
+		}
+		//load those registers
+		if(colors!=-1){
+			for(int i=0;i<colors+1;i++){
+				code = "load $t"+i+"\n"+code;
+				code = code+"\nsave $t"+i;
+			}
+		}
 		for (RegisterNode each : registers) {
 			code = code.replace(", " + each.getvariable(),
 					", $t" + each.getColor());
+			code = code.replace(each.getvariable()+":",
+					"$t" + each.getColor()+":");
 		}
 		return code;
 	}
