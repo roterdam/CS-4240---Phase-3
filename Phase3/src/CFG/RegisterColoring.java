@@ -118,21 +118,21 @@ public class RegisterColoring {
 		// }
 		// }
 		// }
-//		if (instruction.length > 1) {
-//			if (instruction[1].contains(".space")
-//					|| instruction[1].contains(".word")
-//					|| instruction[1].contains(".byte")) {
-//				// this is an assign operation
-//				// var:, op, size/value
-//				String inst = instruction[0].replace(":", "");
-//				list.add(new RegisterNode(inst,lineNumber, ""));
-//				try {
-//					Integer.parseInt(instruction[2]);
-//				} catch (NumberFormatException e) {
-//					list.add(new RegisterNode(instruction[2], lineNumber, ""));
-//				}
-//			}
-//		}
+		// if (instruction.length > 1) {
+		// if (instruction[1].contains(".space")
+		// || instruction[1].contains(".word")
+		// || instruction[1].contains(".byte")) {
+		// // this is an assign operation
+		// // var:, op, size/value
+		// String inst = instruction[0].replace(":", "");
+		// list.add(new RegisterNode(inst,lineNumber, ""));
+		// try {
+		// Integer.parseInt(instruction[2]);
+		// } catch (NumberFormatException e) {
+		// list.add(new RegisterNode(instruction[2], lineNumber, ""));
+		// }
+		// }
+		// }
 		if (instruction[0].equals("return")) {
 			// this is a return operation
 			// op, x,
@@ -349,26 +349,89 @@ public class RegisterColoring {
 	 * @return
 	 */
 	private String makeIRCode(ArrayList<RegisterNode> registers, String code) {
-		//determine the number of registers needed for the block
-		int colors=-1;
-		for(RegisterNode each:registers){
-			if(each.getColor()>colors){
+		// determine the number of registers needed for the block
+		int colors = -1;
+		for (RegisterNode each : registers) {
+			if (each.getColor() > colors) {
 				colors = each.getColor();
 			}
 		}
-		//load those registers
-		if(colors!=-1){
-			for(int i=0;i<colors+1;i++){
-				code = "load $t"+i+"\n"+code;
-				code = code+"\nsave $t"+i;
-			}
+		String loads = "";
+		String stores = "";
+		// load/store those registers
+		if (colors != -1) {
+			loads = determineLoads(colors, registers, code);
+			stores = determineSaves(determineLoads(colors, registers, code));
 		}
 		for (RegisterNode each : registers) {
 			code = code.replace(", " + each.getvariable(),
 					", $t" + each.getColor());
-			code = code.replace(each.getvariable()+":",
-					"$t" + each.getColor()+":");
+			code = code.replace(each.getvariable() + ":",
+					"$t" + each.getColor() + ":");
 		}
+		
+		code= loads+code+"\n"+stores;
+
 		return code;
+	}
+
+	/**
+	 * We need to determine the registers that get saved. We'll cheat and look
+	 * at the loads and just change them to saves instead
+	 * 
+	 * @param colors
+	 * @param registers
+	 * @param code
+	 * @return
+	 */
+	private String determineSaves(String loads) {
+		loads = loads.replace("load", "store");
+		loads = loads.substring(0, loads.lastIndexOf("\n"));
+		return loads;
+	}
+
+	/**
+	 * So this method will determine where we load values from. For CFG, we are
+	 * to use the first instance of a register and load that label
+	 * 
+	 * @param colors
+	 * @param registers
+	 * @param code
+	 * @return
+	 */
+	private String determineLoads(int colors,
+			ArrayList<RegisterNode> registers, String code) {
+		String loads = "";
+		ArrayList<Integer> loadedRegisters = new ArrayList<Integer>();
+
+		String[] lines = code.split("\n");
+		for (String each : lines) {
+			if (loadedRegisters.size() > colors) {
+				break;
+			}
+			String[] separated = (each.trim()).split(",");
+			for (String eachPart : separated) {
+				for (RegisterNode reg : registers) {
+					if (reg.getvariable().equals(eachPart.trim())) {
+						if (!loadedRegisters.contains(reg.getColor())) {
+							loadedRegisters.add(reg.getColor());
+							loads = loads + reg.getvariable() + "\n";
+						}
+					}
+				}
+			}
+		}
+		// now we have which variables are the important ones
+		String[] variables = loads.split("\n");
+		loads = "";
+		for (String each : variables) {
+			for (RegisterNode node : registers) {
+				if (node.getvariable().equals(each)) {
+					loads = loads + "load $t" + node.getColor() + ", "
+							+ node.getvariable() + "\n";
+				}
+			}
+		}
+		return loads;
 	}
 }

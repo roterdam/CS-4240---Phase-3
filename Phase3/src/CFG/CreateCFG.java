@@ -178,7 +178,7 @@ public class CreateCFG {
 		for (CFGNode each : blocks) {
 			nodeStack.add(each);
 		}
-
+		
 		CFGNode current = startNode; // so first start with the current node
 		while (!nodeStack.isEmpty()) {
 			String[] elements = current.toString().split("\n");
@@ -207,6 +207,11 @@ public class CreateCFG {
 					current.setNextBlock(nextNode);
 					nodeStack.remove(current);
 					current = nextNode;
+				}
+				if(nextElement.compareTo("")==0){
+					//the next element is the end of code
+					nodeStack.remove(current);
+					return startNode;
 				}
 			}
 			// if goto
@@ -281,7 +286,7 @@ public class CreateCFG {
 		while (num < blocks.size() + 1) {
 			for (CFGNode each : blocks) {
 				if (each.getBlockNumber() == num) {
-					ircode = ircode + "\n***\n" + each.getIrCode();
+					ircode = ircode + "\n" + each.getIrCode();
 				}
 			}
 			num++;

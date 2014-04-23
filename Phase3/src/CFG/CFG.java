@@ -24,7 +24,6 @@ public class CFG {
 		HashSet<CFGNode> blocks = cfg.buildBlocks(leaders, originalCode);
 		//make a connected graph of blocks
 		CFGNode graph = cfg.createEdges(blocks,originalCode);
-
 		//let's start playing with registers now
 		for(CFGNode each:blocks){
 			RegisterColoring colorMe = new RegisterColoring(each);
