@@ -118,21 +118,21 @@ public class RegisterColoring {
 		// }
 		// }
 		// }
-		if (instruction.length > 1) {
-			if (instruction[1].contains(".space")
-					|| instruction[1].contains(".word")
-					|| instruction[1].contains(".byte")) {
-				// this is an assign operation
-				// var:, op, size/value
-				String inst = instruction[0].replace(":", "");
-				list.add(new RegisterNode(inst,lineNumber, ""));
-				try {
-					Integer.parseInt(instruction[2]);
-				} catch (NumberFormatException e) {
-					list.add(new RegisterNode(instruction[2], lineNumber, ""));
-				}
-			}
-		}
+//		if (instruction.length > 1) {
+//			if (instruction[1].contains(".space")
+//					|| instruction[1].contains(".word")
+//					|| instruction[1].contains(".byte")) {
+//				// this is an assign operation
+//				// var:, op, size/value
+//				String inst = instruction[0].replace(":", "");
+//				list.add(new RegisterNode(inst,lineNumber, ""));
+//				try {
+//					Integer.parseInt(instruction[2]);
+//				} catch (NumberFormatException e) {
+//					list.add(new RegisterNode(instruction[2], lineNumber, ""));
+//				}
+//			}
+//		}
 		if (instruction[0].equals("return")) {
 			// this is a return operation
 			// op, x,
