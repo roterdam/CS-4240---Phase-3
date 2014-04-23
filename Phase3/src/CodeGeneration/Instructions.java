@@ -97,7 +97,11 @@ public class Instructions {
 		} else if ((regZ == null) && (label == null) && (offset == null)){
 			return ("\t" + mipsOp + " " + regX + " " + regY + " " + immediate);
 		} else {
-			return ("\t" + text);
+			if (text != null) {
+				return ("\t" + text);
+			} else {
+				return null;
+			}
 		}
 	}
 	

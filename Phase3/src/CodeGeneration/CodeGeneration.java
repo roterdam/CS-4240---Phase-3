@@ -8,9 +8,12 @@ public class CodeGeneration {
 	private int offset;
 	private IRList l;
 	private Instructions instr;
+	private boolean call, callr;
 	
 	public CodeGeneration() {
 		list = new LinkedList<Instructions>();
+		call = false;
+		callr = false;
 		offset = 4;
 		//ir = l.list();
 	}
@@ -26,21 +29,15 @@ public class CodeGeneration {
 		list.add(instr);
 		
 		for (IR r: ir) {
-			if (r.getIrOp().equals(IROPCODE.ASSIGN)) {
-				/*instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
-				instr.setMipsOp(MIPSOPCODE.la);
-				list.add(instr);
-				instr = new Instructions(null, r.getRegX(), r.getRegY(), null, null, null, null);
-				instr.setMipsOp(MIPSOPCODE.lw);
-				list.add(instr);*/
-			} else if (r.getIrOp().equals(IROPCODE.LOAD)) {
+			if (r.getIrOp().equals(IROPCODE.LOAD)) {
 				instr = new Instructions(null, r.getRegX(), null, null, null, null, r.getLabel());
 				instr.setMipsOp(MIPSOPCODE.la);
 				list.add(instr);
 				instr = new Instructions(null, r.getRegX(), r.getRegX(), null, null, null, null);
 				instr.setMipsOp(MIPSOPCODE.lw);
 				list.add(instr);
-			} else if (r.getIrOp().equals(IROPCODE.CALL)) {
+			} else if ((r.getIrOp().equals(IROPCODE.CALL)) && 
+					((!call) || (r.getArgs().getFirst().getLabel().equals("printi")))) {
 				if (r.getArgs().getFirst().getLabel().equals("printi")) {
 					instr = new Instructions(null, REGISTERS.$v0, null, null, null, "1", null);
 					instr.setMipsOp(MIPSOPCODE.li);
@@ -54,7 +51,15 @@ public class CodeGeneration {
 					instr = new Instructions(null, null, null, null, null, null, null);
 					instr.setMipsOp(MIPSOPCODE.syscall);
 					list.add(instr);
+					instr = new Instructions(null, REGISTERS.$ra, null, null, null, null, null);
+					instr.setMipsOp(MIPSOPCODE.jr);
+					list.add(instr);
 				} else {
+					call = true;
+					instr = new Instructions(null, null, null, null, null, null, r.getLabel());
+					instr.setMipsOp(MIPSOPCODE.jal);
+					list.add(instr);
+					
 					for (IR ir: r.getArgs()) {
 						saveArg(ir.getRegX());
 					}
@@ -65,9 +70,25 @@ public class CodeGeneration {
 					instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
 							null, r.getImmediate(), r.getLabel());
 					list.add(instr);
-					endStack();
 				}
-			} else if (r.getIrOp().equals(IROPCODE.CALLR)) {
+			} else if (call) {
+				if (r.getIrOp().equals(IROPCODE.RETURN)) {
+					call = false;
+					endStack();
+					instr = new Instructions(null, REGISTERS.$ra, null, null, null, null, null);
+					instr.setMipsOp(MIPSOPCODE.jr);
+					list.add(instr);
+				} else {
+					instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
+							null, r.getImmediate(), r.getLabel());
+					list.add(instr);
+				}
+			} else if (r.getIrOp().equals(IROPCODE.CALLR) && (!callr)) {
+				callr = true;
+				instr = new Instructions(null, null, null, null, null, null, r.getLabel());
+				instr.setMipsOp(MIPSOPCODE.jal);
+				list.add(instr);
+				
 				for (IR ir: r.getArgs()) {
 					saveArg(ir.getRegX());
 				}
@@ -78,7 +99,21 @@ public class CodeGeneration {
 				instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
 						null, r.getImmediate(), r.getLabel());
 				list.add(instr);
-				endStack();
+			} else if (callr) {
+				if (r.getIrOp().equals(IROPCODE.RETURN)) {
+					callr = false;
+					endStack();
+					instr = new Instructions(null, r.getRegX(), REGISTERS.$v0, null, null, null, null);
+					instr.setMipsOp(MIPSOPCODE.move);
+					list.add(instr);
+					instr = new Instructions(null, REGISTERS.$ra, null, null, null, null, null);
+					instr.setMipsOp(MIPSOPCODE.jr);
+					list.add(instr);
+				} else {
+					instr = new Instructions(r.getIrOp(), r.getRegX(), r.getRegY(), r.getRegZ(), 
+							null, r.getImmediate(), r.getLabel());
+					list.add(instr);
+				}
 			} else if (r.getIrOp().equals(IROPCODE.ARRAY_STORE)) {
 				/*********		$t5 contains the memory address of array	***********/
 				instr = new Instructions(null, REGISTERS.$t5, null, null, 
@@ -136,7 +171,6 @@ public class CodeGeneration {
 	}
 	
 	private void startStack() {
-		
 		/***** create stack *****/
 		instr = new Instructions(IROPCODE.ADD, REGISTERS.$sp, REGISTERS.$sp, null, 
 				null, "-3", null);
