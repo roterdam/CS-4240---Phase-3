@@ -20,17 +20,18 @@ public class RegisterAllocation {
 				+ "\nmain:\nbrgeq, i, 100, end_loop\narray_load, t1, X, i\narray_load, t2, Y, i\nmult, t3, t1, t2\n"
 				+ "add, sum, sum, t3\nadd, i, i, 1\ngoto, main, ,\nend_loop:\ncall, printi, sum";
 		String ex2 = "print:\ncall, printi, n\nmain:\ncall, print, 5";
-
 		/****************** CFG ************************************* */
 		CFG controlFlowGraph = new CFG();
 		ArrayList<String> code = controlFlowGraph.doCFG(ex1);
 
+		for (String each : code) {
+			System.out.println(each);
+		}
 		/***************** EBB ****************************************/
 		MakeEBB ebb = new MakeEBB(null, "");
 		ArrayList<String> ebbCode = ebb.doEBB(ex1);
-		
-		for(String each:ebbCode){
-			System.out.println(each);
-		}
+//		for (String each : ebbCode) {
+//		System.out.println(each);
+//	}
 	}
 }

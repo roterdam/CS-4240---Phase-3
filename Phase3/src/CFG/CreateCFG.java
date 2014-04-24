@@ -27,7 +27,9 @@ public class CreateCFG {
 	public HashSet<CFGNode> buildBlocks(HashSet<String> leaders, String irCode) {
 		ArrayList<String> leaderList = new ArrayList<String>();
 		for (String each : leaders) {
-			leaderList.add(each);
+			if (!leaderList.contains(each)) {
+				leaderList.add(each);
+			}
 		}
 
 		HashSet<CFGNode> blocks = new HashSet<CFGNode>();
