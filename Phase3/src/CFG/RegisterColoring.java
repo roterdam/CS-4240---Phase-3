@@ -48,11 +48,13 @@ public class RegisterColoring {
 	 */
 	public String makeNewIRCode() {
 		String[] lines = {};
+		
 		// get the irCoe from a block
 		if (theBlock != null) { // working with basic blocks
 			lines = theBlock.getIrCode().split("\n");
 		}
 		if (theEBB != null) { // working with EBB
+			theEBB.getIRCode();
 			lines = theEBB.getCode().split("\n");
 		}
 
