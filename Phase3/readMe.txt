@@ -30,6 +30,63 @@ This is the main method class for CFG. It contains the following methods:
 	from the last statement of B1 to the first statement of B2, or (2) Control
 	flow can fall through from B1 to B2 because: (i) B2 immediately follows B1,
 	 and (ii) B1 does not end with an unconditional branch(goto)
+	d) printOutNewCode - This method orders the basic blocks and then prints out 
+	the IR code 
 4) RegisterColoring.java
+This is the class that will take in a block and then read its information to
+create a graph out of the registers and color them appropriately. It uses the 
+following methods, which are all self explainatory by the names. For more detailed information,
+read the java docs.
+	makeRegisters, determineNeighbors, determineLiveliness, colorRegisters, makeIRCode, 
+	determineSaves, determineLoads, makeNewIRCode
 5) RegisterNode.java
+	This class is used in the CFG graph coloring of registers. It is used to put a regsiter in a node.
+	A register node contains:variable, color, lineNumber,first (instance) ,last (instance), neighbors;
+
+To run the CFG code, all you have to do is use the following two lines of code:
+CFG controlFlowGraph = new CFG();
+ArrayList<String> code = controlFlowGraph.doCFG(ex1);
+
+Where "ex1" is a String of IRcode with each line separated by "\n". You can also navigate to 
+RegisterAllocation.java and uncomment the first for loop.
+
+/****************************EBB *********************************************\
+All of the EBB code is contained either in the EBB package, or uses some files from the CFG package.
+EBB is Extended Basic Blocks.
+Here are explainations of each EBB file:
+1) EBBMethods
+	Ignore this file. It is never used.
+2) EBBNode
+	This is a node representing an Extended Basic Block. It contains a list of the internal
+	basic blocks, a list of the EBB successors, and the IR code for the EBB. 
+3) MakeEBB
+	This is the main method for EBB. It's methods are self explainatory. The main method is doEBB.
+	It does the following: create basic blocks and connect them using CFG methods, make extended
+	basic blocks (where the first block can have multiple successors, but other blocks can only have one),
+	connect the basic blocks in a directed graph, do the register coloring and optimization as in CFG,
+	replace variables with registers, and add loads and stores.
+
+
+/*************** EBB AND CFG *********************\
+Both EBB and CFG return an arraylist of strings, with each element in the arraylist being a line of the
+IR code. Both EBB and CFG were tested using the following two IR codes:
+// white space
+		String ex1 =X:, .space, 100,
+					Y:, .word, 100,
+					i:, .word, 0,
+					sum:, .word, 0,"
+					main:
+					brgeq, i, 100, end_loop
+					array_load, t1, X, i
+					array_load, t2, Y, i
+					mult, t3, t1, t2
+					add, sum, sum, t3
+					add, i, i, 1
+					goto, main, ,
+					end_loop:
+					call, printi, sum
+		String ex2 = print:
+					call, printi, 
+					main:
+					call, print, 5
 For further information on methods, each of these files are java doc'd and commented.
