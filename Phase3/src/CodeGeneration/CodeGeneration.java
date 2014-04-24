@@ -15,7 +15,7 @@ public class CodeGeneration {
 		call = false;
 		callr = false;
 		offset = 4;
-		//ir = l.list();
+		ir = l.list();
 	}
 	
 	public void addInstructions() {	
