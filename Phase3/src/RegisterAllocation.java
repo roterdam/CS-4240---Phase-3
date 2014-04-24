@@ -1,6 +1,13 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import CFG.CFG;
+import CFG.CFGNode;
+import CFG.CreateCFG;
+import CFG.RegisterColoring;
+import EBB.EBBMethods;
+import EBB.EBBNode;
+import EBB.MakeEBB;
 
 /*
  * This is where the testing will take place
@@ -17,21 +24,13 @@ public class RegisterAllocation {
 		/****************** CFG ************************************* */
 		CFG controlFlowGraph = new CFG();
 		ArrayList<String> code = controlFlowGraph.doCFG(ex1);
-		
-		for(String each:code){
-			System.out.println(each);
-		}
 
 		/***************** EBB ****************************************/
-		// EBBMethods ebbMethods = new EBBMethods();
-		// //first, make basic blocks and connect them like doing CFG
-		// HashSet<CFGNode> EBBlocks = cfg.buildBlocks(cfg.findLeaders(ex1),
-		// ex1);
-		// CFGNode BBroot = cfg.createEdges(EBBlocks,ex1);
-		//
-		// //follow the directed graph to create ebb
-		// ArrayList<EBBNode> EBBGraph = ebbMethods.createEBBs(BBroot,
-		// BBroot.getNextBlock().get(0),new CFGNode("null",0));
-		//
+		MakeEBB ebb = new MakeEBB(null, "");
+		ArrayList<String> ebbCode = ebb.doEBB(ex1);
+		
+		for(String each:ebbCode){
+			System.out.println(each);
+		}
 	}
 }

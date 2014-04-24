@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Stack;
 
+import EBB.EBBNode;
+
 /**
  * This is the class that will take in a block and then read its information to
  * create a graph out of the registers and color them appropriately
@@ -16,13 +18,23 @@ import java.util.Stack;
  * 
  */
 public class RegisterColoring {
-	private CFGNode theBlock;
+	private CFGNode theBlock = null;
+	private EBBNode theEBB = null;
 
 	/**
 	 * init
 	 */
 	public RegisterColoring(CFGNode block) {
 		theBlock = block;
+	}
+
+	/**
+	 * alternate init
+	 * 
+	 * @param each
+	 */
+	public RegisterColoring(EBBNode each) {
+		theEBB = each;
 	}
 
 	/**
@@ -35,8 +47,14 @@ public class RegisterColoring {
 	 * regiters back inthe IR code and return it.
 	 */
 	public String makeNewIRCode() {
+		String[] lines = {};
 		// get the irCoe from a block
-		String[] lines = theBlock.getIrCode().split("\n");
+		if (theBlock != null) { // working with basic blocks
+			lines = theBlock.getIrCode().split("\n");
+		}
+		if (theEBB != null) { // working with EBB
+			lines = theEBB.getCode().split("\n");
+		}
 
 		// for each line, change variables into registers
 		ArrayList<RegisterNode> registers = new ArrayList<RegisterNode>();
@@ -55,8 +73,13 @@ public class RegisterColoring {
 		registers = determineNeighbors(registers);
 		// next, color the graph!
 		registers = colorRegisters(registers);
-
-		String newIRCode = makeIRCode(registers, theBlock.getIrCode());
+		String newIRCode = "";
+		if (theBlock != null) { // basic blocks
+			newIRCode = makeIRCode(registers, theBlock.getIrCode());
+		}
+		if (theEBB != null) { // basic blocks
+			newIRCode = makeIRCode(registers, theEBB.getCode());
+		}
 		return newIRCode;
 	}
 
@@ -366,11 +389,11 @@ public class RegisterColoring {
 		for (RegisterNode each : registers) {
 			code = code.replace(", " + each.getvariable(),
 					", $t" + each.getColor());
-			code = code.replace(each.getvariable() + ":",
-					"$t" + each.getColor() + ":");
+			//code = code.replace(each.getvariable() + ":",
+				//	"$t" + each.getColor() + ":");
 		}
-		
-		code= loads+code+"\n"+stores;
+
+		code = loads + code + "\n" + stores;
 
 		return code;
 	}

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import EBB.EBBNode;
 import sun.misc.Queue;
 
 /**
@@ -133,12 +134,12 @@ public class CreateCFG {
 					}
 				}
 			}
-			//This is "Return"
+			// This is "Return"
 			if (lines[i].contains("call")) {
-			// // OBEY rule 3
-			if ((i + 1) <= lines.length-1) {
-				theLeaders.add(lines[i + 1]);
-			}
+				// // OBEY rule 3
+				if ((i + 1) <= lines.length - 1) {
+					theLeaders.add(lines[i + 1]);
+				}
 			}
 		}
 		return theLeaders;
@@ -178,7 +179,7 @@ public class CreateCFG {
 		for (CFGNode each : blocks) {
 			nodeStack.add(each);
 		}
-		
+
 		CFGNode current = startNode; // so first start with the current node
 		while (!nodeStack.isEmpty()) {
 			String[] elements = current.toString().split("\n");
@@ -208,8 +209,8 @@ public class CreateCFG {
 					nodeStack.remove(current);
 					current = nextNode;
 				}
-				if(nextElement.compareTo("")==0){
-					//the next element is the end of code
+				if (nextElement.compareTo("") == 0) {
+					// the next element is the end of code
 					nodeStack.remove(current);
 					return startNode;
 				}
